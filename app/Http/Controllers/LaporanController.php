@@ -10,31 +10,40 @@ class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $bulan = $request->get('bulan', date('Y-m'));
+        $bulan  = $request->get('bulan', date('Y-m'));
+        $user   = \Illuminate\Support\Facades\Auth::user();
+
+        if ($user->role === 'kepala_cabang') {
+            $cabang = $user->cabangRelasi ? $user->cabangRelasi->nama_cabang : ($user->cabang ?? 'Cilawu');
+        } else {
+            $cabang = $request->get('cabang', 'semua');
+        }
         
         $startBulan = Carbon::parse($bulan)->startOfMonth();
         $endBulan   = Carbon::parse($bulan)->endOfMonth();
 
-        $query = Transaksi::with(['pelanggan', 'ikan', 'details.ikan'])
+        $query = Transaksi::with(['pelanggan', 'ikan', 'details.ikan', 'cabangRelasi'])
             ->whereBetween('tanggal_transaksi', [$startBulan, $endBulan])
             ->orderBy('tanggal_transaksi', 'desc');
             
-        $user = \Illuminate\Support\Facades\Auth::user();
-        if ($user->role === 'kepala_cabang') {
-            if ($user->cabang_id) {
-                $query->where('cabang_id', $user->cabang_id);
-            } elseif ($user->cabang) {
-                $query->where('cabang', $user->cabang);
+        if ($cabang !== 'semua') {
+            $selectedCabang = \App\Models\Cabang::where('nama_cabang', $cabang)->first();
+            if ($selectedCabang) {
+                $query->where(function($q) use ($selectedCabang, $cabang) {
+                    $q->where('cabang_id', $selectedCabang->id)
+                      ->orWhere('cabang', $cabang);
+                });
             } else {
-                $query->where('cabang', 'Cilawu');
+                $query->where('cabang', $cabang);
             }
         }
 
         $transaksi = $query->get();
             
         $totalPendapatan = $transaksi->where('status', 'lunas')->sum('total');
-        $totalPiutang = $transaksi->where('status', 'belum_lunas')->sum('total');
-        $totalKg = $transaksi->sum('jumlah_kg');
+        $totalPiutang    = $transaksi->where('status', 'belum_lunas')->sum('total');
+        $totalKg         = $transaksi->sum('jumlah_kg');
+        $totalTransaksi  = $transaksi->count();
 
         // Data chart pendapatan harian dalam bulan laporan
         $chartLabels = [];
@@ -53,6 +62,22 @@ class LaporanController extends Controller
             $chartValues[] = (float) $val;
         }
 
-        return view('laporan.index', compact('transaksi', 'bulan', 'totalPendapatan', 'totalPiutang', 'totalKg', 'chartLabels', 'chartValues'));
+        $daftarCabang = \App\Models\Cabang::pluck('nama_cabang')->toArray();
+        if (empty($daftarCabang)) {
+            $daftarCabang = ['Suci', 'Cilawu', 'Samarang'];
+        }
+
+        return view('laporan.index', compact(
+            'transaksi',
+            'bulan',
+            'cabang',
+            'totalPendapatan',
+            'totalPiutang',
+            'totalKg',
+            'totalTransaksi',
+            'chartLabels',
+            'chartValues',
+            'daftarCabang'
+        ));
     }
 }

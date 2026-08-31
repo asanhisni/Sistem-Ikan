@@ -53,26 +53,34 @@
 
     .search-form input,
     .search-form select {
-        border: 1px solid rgba(148,163,184,0.25);
+        border: 2px solid rgba(148,163,184,0.28);
         background: white;
-        border-radius: 10px;
-        padding: 10px 12px;
+        border-radius: 12px;
+        padding: 12px 14px;
         font: inherit;
+        font-weight: 700;
+        font-size: 14px;
         color: var(--text);
         outline: none;
-        min-height: 42px;
+        min-height: 48px;
+        cursor: pointer;
+        box-sizing: border-box;
     }
 
-    .search-form input { min-width: 190px; }
-    .search-form select { min-width: 150px; }
+    .search-form input { min-width: 200px; cursor: text; }
+    .search-form select { min-width: 160px; }
 
     .search-form button {
         border: none;
         background: #0d1b2a;
         color: white;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-weight: 700;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 800;
+        min-height: 48px;
+        cursor: pointer;
+    }
         cursor: pointer;
     }
 

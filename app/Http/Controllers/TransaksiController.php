@@ -100,8 +100,34 @@ class TransaksiController extends Controller
             $jumlahDibayar = $request->jumlah_dibayar ?? 0;
         }
 
+        // Cari atau buat Pelanggan otomatis (utamakan berdasarkan no HP)
+        $pelangganId = null;
+        $telepon = $request->telepon ? trim($request->telepon) : null;
+        $namaPembeli = trim($request->pembeli_nama);
+
+        if ($telepon) {
+            $pelanggan = Pelanggan::where('telepon', $telepon)->first();
+            if (!$pelanggan) {
+                // Buat pelanggan baru dengan no hp & nama
+                $pelanggan = Pelanggan::create([
+                    'nama' => $namaPembeli,
+                    'telepon' => $telepon,
+                    'cabang' => $userCabangNama,
+                ]);
+            }
+            $pelangganId = $pelanggan->id;
+        } else {
+            // Jika tidak ada no hp, cari berdasarkan nama yang persis
+            $pelanggan = Pelanggan::where('nama', $namaPembeli)->first();
+            if ($pelanggan) {
+                $pelangganId = $pelanggan->id;
+            }
+        }
+
         $transaksi = Transaksi::create([
-            'pembeli_nama' => $request->pembeli_nama,
+            'pelanggan_id' => $pelangganId,
+            'pembeli_nama' => $namaPembeli,
+            'telepon' => $telepon,
             'ikan_id' => $firstIkanId, // backward compatibility
             'jumlah_kg' => $totalKg,
             'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
@@ -125,7 +151,8 @@ class TransaksiController extends Controller
     {
         $transaksi->load('details.ikan', 'ikan');
         $ikan = Ikan::all();
-        return view('transaksi.edit', compact('transaksi', 'ikan'));
+        $pelanggan = Pelanggan::all();
+        return view('transaksi.edit', compact('transaksi', 'ikan', 'pelanggan'));
     }
 
     public function update(Request $request, Transaksi $transaksi)
@@ -175,8 +202,27 @@ class TransaksiController extends Controller
             $jumlahDibayar = $request->jumlah_dibayar ?? 0;
         }
 
+        // Cari atau buat Pelanggan otomatis
+        $pelangganId = $transaksi->pelanggan_id;
+        $telepon = $request->telepon ? trim($request->telepon) : null;
+        $namaPembeli = trim($request->pembeli_nama);
+
+        if ($telepon) {
+            $pelanggan = Pelanggan::where('telepon', $telepon)->first();
+            if (!$pelanggan) {
+                $pelanggan = Pelanggan::create([
+                    'nama' => $namaPembeli,
+                    'telepon' => $telepon,
+                    'cabang' => $transaksi->cabang ?? 'Pusat',
+                ]);
+            }
+            $pelangganId = $pelanggan->id;
+        }
+
         $transaksi->update([
-            'pembeli_nama' => $request->pembeli_nama,
+            'pelanggan_id' => $pelangganId,
+            'pembeli_nama' => $namaPembeli,
+            'telepon' => $telepon,
             'ikan_id' => $firstIkanId,
             'jumlah_kg' => $totalKg,
             'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
