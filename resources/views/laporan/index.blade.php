@@ -112,11 +112,48 @@
     .summary-card.piutang .summary-value { color: var(--red); }
     .summary-card.terjual .summary-value { color: var(--blue); }
 
-    .section-title {
-        font-size: 15px;
+    /* GRAFIK PENDAPATAN PANEL */
+    .revenue-panel {
+        margin-bottom: 24px;
+        padding: 20px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+        border: 1px solid rgba(15, 23, 36, 0.06);
+        box-shadow: 0 10px 30px rgba(11,35,60,0.04);
+    }
+
+    .revenue-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .revenue-panel-title {
+        font-size: 16px;
         font-weight: 800;
         color: var(--text);
-        margin: 10px 0 14px;
+    }
+
+    .revenue-panel-sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .revenue-chart-wrap {
+        position: relative;
+        height: 260px;
+        width: 100%;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text);
+        margin: 14px 0;
     }
 
     .table-card {
@@ -162,7 +199,8 @@
     }
 
     .status-lunas,
-    .status-belum {
+    .status-belum,
+    .status-dp {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -176,6 +214,11 @@
     .status-lunas {
         background: var(--green-light);
         color: var(--green);
+    }
+
+    .status-dp {
+        background: #fef9c3;
+        color: #a16207;
     }
 
     .status-belum {
@@ -314,6 +357,22 @@
         </div>
     </div>
 
+    <!-- Grafik Pendapatan Pindahan dari Dashboard -->
+    <div class="revenue-panel">
+        <div class="revenue-panel-header">
+            <div>
+                <div class="revenue-panel-title">Grafik Pendapatan Harian</div>
+                <div class="revenue-panel-sub">Perkembangan total omset penjualan selama periode {{ Carbon\Carbon::parse($bulan)->isoFormat('MMMM YYYY') }}</div>
+            </div>
+            <div style="font-weight: 800; font-size: 14px; color: var(--green); background: var(--green-light); padding: 6px 12px; border-radius: 999px;">
+                Total: Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
+            </div>
+        </div>
+        <div class="revenue-chart-wrap">
+            <canvas id="laporanRevenueChart"></canvas>
+        </div>
+    </div>
+
     <div class="section-title">Rincian Transaksi Bulan Ini</div>
 
     <div class="table-card">
@@ -334,12 +393,22 @@
                     <tr>
                         <td>{{ $t->tanggal_transaksi->format('d/m/Y') }}</td>
                         <td style="font-weight: 700;">{{ $t->pembeli_nama }}</td>
-                        <td>{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</td>
+                        <td>
+                            @if($t->details && $t->details->count() > 0)
+                                @foreach($t->details as $d)
+                                    <div>{{ $d->ikan ? $d->ikan->nama_ikan : '-' }} ({{ $d->jumlah_kg }} Kg)</div>
+                                @endforeach
+                            @else
+                                {{ $t->ikan ? $t->ikan->nama_ikan : '-' }}
+                            @endif
+                        </td>
                         <td>{{ $t->jumlah_kg }}</td>
                         <td style="font-weight: 700;">{{ number_format($t->total, 0, ',', '.') }}</td>
                         <td>
                             @if($t->status == 'lunas')
                                 <span class="status-lunas">LUNAS</span>
+                            @elseif($t->status == 'dp')
+                                <span class="status-dp">DP</span>
                             @else
                                 <span class="status-belum">BELUM</span>
                             @endif
@@ -369,15 +438,25 @@
             </div>
             <div class="mobile-meta">
                 <span>{{ $t->tanggal_transaksi->format('d/m/Y') }}</span>
-                <span>{{ $t->jumlah_kg }} Kg</span>
+                <span>Total: {{ $t->jumlah_kg }} Kg</span>
             </div>
-            <div class="mobile-meta">
-                <span>{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
-                @if($t->status == 'lunas')
-                    <span class="status-lunas">LUNAS</span>
+            <div class="mobile-meta" style="flex-direction: column; gap: 4px;">
+                @if($t->details && $t->details->count() > 0)
+                    @foreach($t->details as $d)
+                        <div>&bull; {{ $d->ikan ? $d->ikan->nama_ikan : '-' }} ({{ $d->jumlah_kg }} Kg)</div>
+                    @endforeach
                 @else
-                    <span class="status-belum">BELUM</span>
+                    <span>{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
                 @endif
+                <div style="margin-top: 6px;">
+                    @if($t->status == 'lunas')
+                        <span class="status-lunas">LUNAS</span>
+                    @elseif($t->status == 'dp')
+                        <span class="status-dp">DP</span>
+                    @else
+                        <span class="status-belum">BELUM</span>
+                    @endif
+                </div>
             </div>
         </div>
         @empty
@@ -389,3 +468,58 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const chartLabels = @json($chartLabels ?? []);
+    const chartValues = @json($chartValues ?? []);
+
+    if (document.getElementById('laporanRevenueChart') && chartLabels.length > 0) {
+        const ctx = document.getElementById('laporanRevenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Pendapatan',
+                    data: chartValues,
+                    borderRadius: 6,
+                    backgroundColor: 'rgba(30, 136, 229, 0.8)',
+                    borderColor: '#1e88e5',
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID'),
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#6b7280',
+                            font: { size: 11, weight: '600' }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(148,163,184,0.12)' },
+                        ticks: {
+                            callback: value => 'Rp ' + Number(value).toLocaleString('id-ID'),
+                            color: '#6b7280',
+                            font: { size: 11, weight: '600' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+@endpush

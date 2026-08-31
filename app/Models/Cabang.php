@@ -13,6 +13,7 @@ class Cabang extends Model
         'kode_cabang',
         'nama_cabang',
         'lokasi',
+        'admin_merangkap',
     ];
 
     public function users(): HasMany

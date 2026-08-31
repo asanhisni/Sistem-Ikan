@@ -17,7 +17,7 @@ class TransaksiController extends Controller
         $status = $request->get('status');
 
         $user = Auth::user();
-        $query = Transaksi::with(['pelanggan', 'ikan', 'cabangRelasi'])->orderBy('tanggal_transaksi', 'desc');
+        $query = Transaksi::with(['pelanggan', 'ikan', 'cabangRelasi', 'details.ikan'])->orderBy('tanggal_transaksi', 'desc');
 
         if ($user->role === 'kepala_cabang') {
             if ($user->cabang_id) {
@@ -51,23 +51,48 @@ class TransaksiController extends Controller
     {
         $request->validate([
             'pembeli_nama' => 'required|string|max:255',
-            'ikan_id' => 'required|exists:ikan,id',
-            'jumlah_kg' => 'required|numeric|min:0.1',
+            'items' => 'required|array|min:1',
+            'items.*.ikan_id' => 'required|exists:ikan,id',
+            'items.*.jumlah_kg' => 'required|numeric|min:0.1',
             'status' => 'required|in:lunas,belum_lunas,dp',
             'jumlah_dibayar' => 'nullable|numeric|min:0',
         ], [
             'pembeli_nama.required' => 'Nama Pembeli harus diisi.',
-            'ikan_id.required' => 'Pilih jenis ikan.',
-            'jumlah_kg.required' => 'Jumlah (Kg) harus diisi.',
+            'items.required' => 'Minimal pilih 1 jenis ikan.',
+            'items.min' => 'Minimal pilih 1 jenis ikan.',
+            'items.*.ikan_id.required' => 'Jenis ikan harus dipilih.',
+            'items.*.jumlah_kg.required' => 'Jumlah (Kg) harus diisi.',
+            'items.*.jumlah_kg.min' => 'Jumlah (Kg) minimal 0.1.',
         ]);
 
         $user = Auth::user();
         $userCabangNama = $user->cabangRelasi ? $user->cabangRelasi->nama_cabang : ($user->cabang ?? 'Cilawu');
         $userCabangId = $user->cabang_id;
 
-        $ikan = Ikan::findOrFail($request->ikan_id);
-        $total = $ikan->harga_per_kg * $request->jumlah_kg;
-        
+        $total = 0;
+        $totalKg = 0;
+        $detailsData = [];
+        $firstIkanId = null;
+
+        foreach ($request->items as $item) {
+            $ikanModel = Ikan::findOrFail($item['ikan_id']);
+            $kg = (float) $item['jumlah_kg'];
+            $subtotal = $ikanModel->harga_per_kg * $kg;
+            $total += $subtotal;
+            $totalKg += $kg;
+
+            if (!$firstIkanId) {
+                $firstIkanId = $ikanModel->id;
+            }
+
+            $detailsData[] = [
+                'ikan_id' => $ikanModel->id,
+                'jumlah_kg' => $kg,
+                'harga_per_kg' => $ikanModel->harga_per_kg,
+                'subtotal' => $subtotal,
+            ];
+        }
+
         $jumlahDibayar = 0;
         if ($request->status === 'lunas') {
             $jumlahDibayar = $total;
@@ -77,9 +102,9 @@ class TransaksiController extends Controller
 
         $transaksi = Transaksi::create([
             'pembeli_nama' => $request->pembeli_nama,
-            'ikan_id' => $request->ikan_id,
-            'jumlah_kg' => $request->jumlah_kg,
-            'harga_per_kg' => $ikan->harga_per_kg,
+            'ikan_id' => $firstIkanId, // backward compatibility
+            'jumlah_kg' => $totalKg,
+            'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
             'total' => $total,
             'status' => $request->status,
             'jumlah_dibayar' => $jumlahDibayar,
@@ -88,13 +113,17 @@ class TransaksiController extends Controller
             'cabang_id' => $userCabangId,
             'keterangan' => $request->keterangan,
         ]);
-        
-            // Redirect kembali ke daftar transaksi dengan notifikasi sukses
-            return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan!');
+
+        foreach ($detailsData as $detail) {
+            $transaksi->details()->create($detail);
+        }
+
+        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan!');
     }
 
     public function edit(Transaksi $transaksi)
     {
+        $transaksi->load('details.ikan', 'ikan');
         $ikan = Ikan::all();
         return view('transaksi.edit', compact('transaksi', 'ikan'));
     }
@@ -103,15 +132,42 @@ class TransaksiController extends Controller
     {
         $request->validate([
             'pembeli_nama' => 'required|string|max:255',
-            'ikan_id' => 'required|exists:ikan,id',
-            'jumlah_kg' => 'required|numeric|min:0.1',
+            'items' => 'required|array|min:1',
+            'items.*.ikan_id' => 'required|exists:ikan,id',
+            'items.*.jumlah_kg' => 'required|numeric|min:0.1',
             'status' => 'required|in:lunas,belum_lunas,dp',
             'jumlah_dibayar' => 'nullable|numeric|min:0',
+        ], [
+            'pembeli_nama.required' => 'Nama Pembeli harus diisi.',
+            'items.required' => 'Minimal pilih 1 jenis ikan.',
+            'items.*.ikan_id.required' => 'Jenis ikan harus dipilih.',
+            'items.*.jumlah_kg.required' => 'Jumlah (Kg) harus diisi.',
         ]);
 
-        $ikan = Ikan::findOrFail($request->ikan_id);
-        $total = $ikan->harga_per_kg * $request->jumlah_kg;
-        
+        $total = 0;
+        $totalKg = 0;
+        $detailsData = [];
+        $firstIkanId = null;
+
+        foreach ($request->items as $item) {
+            $ikanModel = Ikan::findOrFail($item['ikan_id']);
+            $kg = (float) $item['jumlah_kg'];
+            $subtotal = $ikanModel->harga_per_kg * $kg;
+            $total += $subtotal;
+            $totalKg += $kg;
+
+            if (!$firstIkanId) {
+                $firstIkanId = $ikanModel->id;
+            }
+
+            $detailsData[] = [
+                'ikan_id' => $ikanModel->id,
+                'jumlah_kg' => $kg,
+                'harga_per_kg' => $ikanModel->harga_per_kg,
+                'subtotal' => $subtotal,
+            ];
+        }
+
         $jumlahDibayar = 0;
         if ($request->status === 'lunas') {
             $jumlahDibayar = $total;
@@ -121,20 +177,27 @@ class TransaksiController extends Controller
 
         $transaksi->update([
             'pembeli_nama' => $request->pembeli_nama,
-            'ikan_id' => $request->ikan_id,
-            'jumlah_kg' => $request->jumlah_kg,
-            'harga_per_kg' => $ikan->harga_per_kg,
+            'ikan_id' => $firstIkanId,
+            'jumlah_kg' => $totalKg,
+            'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
             'total' => $total,
             'status' => $request->status,
             'jumlah_dibayar' => $jumlahDibayar,
             'keterangan' => $request->keterangan,
         ]);
 
+        // Hapus detail lama dan masukkan yang baru
+        $transaksi->details()->delete();
+        foreach ($detailsData as $detail) {
+            $transaksi->details()->create($detail);
+        }
+
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diubah!');
     }
 
     public function destroy(Transaksi $transaksi)
     {
+        $transaksi->details()->delete();
         $transaksi->delete();
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dihapus!');
     }

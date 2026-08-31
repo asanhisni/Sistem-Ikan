@@ -7,6 +7,7 @@ use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\IkanController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,4 +33,5 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pelanggan', PelangganController::class);
     Route::resource('ikan', IkanController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::resource('users', UserController::class);
 });

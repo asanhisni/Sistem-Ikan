@@ -15,7 +15,7 @@ class LaporanController extends Controller
         $startBulan = Carbon::parse($bulan)->startOfMonth();
         $endBulan   = Carbon::parse($bulan)->endOfMonth();
 
-        $query = Transaksi::with(['pelanggan', 'ikan'])
+        $query = Transaksi::with(['pelanggan', 'ikan', 'details.ikan'])
             ->whereBetween('tanggal_transaksi', [$startBulan, $endBulan])
             ->orderBy('tanggal_transaksi', 'desc');
             
@@ -36,6 +36,23 @@ class LaporanController extends Controller
         $totalPiutang = $transaksi->where('status', 'belum_lunas')->sum('total');
         $totalKg = $transaksi->sum('jumlah_kg');
 
-        return view('laporan.index', compact('transaksi', 'bulan', 'totalPendapatan', 'totalPiutang', 'totalKg'));
+        // Data chart pendapatan harian dalam bulan laporan
+        $chartLabels = [];
+        $chartValues = [];
+        $daysInMonth = $startBulan->daysInMonth;
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $tgl = $startBulan->copy()->day($d);
+            if ($tgl->isFuture() && $startBulan->isCurrentMonth()) {
+                break;
+            }
+            $tglStr = $tgl->format('Y-m-d');
+            $chartLabels[] = $tgl->format('d/m');
+            $val = $transaksi->filter(function($item) use ($tglStr) {
+                return $item->tanggal_transaksi->format('Y-m-d') === $tglStr;
+            })->sum('total');
+            $chartValues[] = (float) $val;
+        }
+
+        return view('laporan.index', compact('transaksi', 'bulan', 'totalPendapatan', 'totalPiutang', 'totalKg', 'chartLabels', 'chartValues'));
     }
 }

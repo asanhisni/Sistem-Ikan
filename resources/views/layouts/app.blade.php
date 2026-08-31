@@ -364,34 +364,7 @@
             .b-nav-item.active i {
                 transform: scale(1.04);
             }
-
-            .fab-create {
-                position: fixed;
-                right: 18px;
-                bottom: 82px;
-                z-index: 1000;
-            }
-            .fab-create .btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 54px;
-                height: 54px;
-                border-radius: 50%;
-                box-shadow: 0 10px 28px rgba(30,136,229,0.28);
-                background: var(--blue);
-                color: #fff;
-                border: none;
-                font-size: 24px;
-                font-weight: 700;
-                text-decoration: none;
-            }
-            body.page-transaksi .fab-create {
-                display: block;
-            }
         }
-
-        body.page-transaksi .fab-create { display:block; }
 
         .card, .stat-card, .table-card, .tabel-sederhana, .pos-card {
             border-radius: var(--radius);
@@ -445,6 +418,10 @@
             <i class="fas fa-fish"></i>
             Data Ikan
         </a>
+        <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+            <i class="fas fa-user-tie"></i>
+            Kepala Cabang
+        </a>
         @endif
 
         <a href="{{ route('laporan.index') }}" class="nav-item {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
@@ -463,11 +440,6 @@
         </form>
     </div>
 </aside>
-
-<!-- Floating Action Button (di luar sidebar) -->
-<div class="fab-create" aria-hidden="false">
-    <a href="{{ route('transaksi.create') }}" class="btn" title="Buat Transaksi Baru">+</a>
-</div>
 
 <!-- ══════════════ MAIN ══════════════ -->
 <div class="main-wrap">

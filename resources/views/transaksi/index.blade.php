@@ -380,8 +380,24 @@
                             <div class="tgl-transaksi"><i class="fas fa-calendar-alt"></i> {{ $t->tanggal_transaksi->format('d M Y - H:i') }}</div>
                         </td>
                         <td>
-                            <div class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</div>
-                            <div>{{ $t->jumlah_kg }} Kg</div>
+                            @if($t->details && $t->details->count() > 0)
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    @foreach($t->details as $d)
+                                        <div>
+                                            <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span>
+                                            <span style="font-size: 13px; color: var(--text-muted);">({{ $d->jumlah_kg }} Kg)</span>
+                                        </div>
+                                    @endforeach
+                                    @if($t->details->count() > 1)
+                                        <div style="font-size: 11px; font-weight: 700; color: #166534; margin-top: 2px;">
+                                            Total: {{ $t->jumlah_kg }} Kg
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</div>
+                                <div>{{ $t->jumlah_kg }} Kg</div>
+                            @endif
                         </td>
                         <td>
                             <div class="total-harga">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
@@ -430,17 +446,27 @@
             </div>
             <div class="mobile-meta">
                 <span>{{ $t->tanggal_transaksi->format('d M Y') }}</span>
-                <span>{{ $t->jumlah_kg }} Kg</span>
+                <span>Total: {{ $t->jumlah_kg }} Kg</span>
             </div>
-            <div class="mobile-meta" style="margin-bottom: 12px;">
-                <span class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
-                @if($t->status == 'lunas')
-                    <span class="status-lunas"><i class="fas fa-check"></i> LUNAS</span>
-                @elseif($t->status == 'dp')
-                    <span class="status-dp"><i class="fas fa-hand-holding-usd"></i> DP</span>
+            <div class="mobile-meta" style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;">
+                @if($t->details && $t->details->count() > 0)
+                    <div style="font-size: 13px;">
+                        @foreach($t->details as $d)
+                            <div>&bull; <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span> ({{ $d->jumlah_kg }} Kg)</div>
+                        @endforeach
+                    </div>
                 @else
-                    <span class="status-belum"><i class="fas fa-times"></i> BELUM</span>
+                    <span class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
                 @endif
+                <div style="margin-top: 6px;">
+                    @if($t->status == 'lunas')
+                        <span class="status-lunas"><i class="fas fa-check"></i> LUNAS</span>
+                    @elseif($t->status == 'dp')
+                        <span class="status-dp"><i class="fas fa-hand-holding-usd"></i> DP</span>
+                    @else
+                        <span class="status-belum"><i class="fas fa-times"></i> BELUM</span>
+                    @endif
+                </div>
             </div>
             <div class="mobile-actions">
                 <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
@@ -464,9 +490,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    try { document.body.classList.add('page-transaksi'); } catch(e){}
-</script>
-@endpush
