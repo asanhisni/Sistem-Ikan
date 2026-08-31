@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('ikan', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_ikan');
+            $table->string('jenis')->nullable();
+            $table->decimal('harga_per_kg', 15, 2)->default(0);
+            $table->decimal('stok_kg', 10, 2)->default(0);
+            $table->string('satuan')->default('kg');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('ikan');
+    }
+};
