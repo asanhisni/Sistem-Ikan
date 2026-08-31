@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $bulan  = $request->get('bulan', 'ini');
         
         if ($user->role === 'kepala_cabang') {
-            $cabang = 'Cabang 1';
+            $cabang = $user->cabangRelasi ? $user->cabangRelasi->nama_cabang : 'Cilawu';
         } else {
             $cabang = $request->get('cabang', 'semua');
         }
@@ -33,7 +33,15 @@ class DashboardController extends Controller
         // ─── Base query dengan filter cabang ─────────────────────────────────
         $baseQuery = Transaksi::query();
         if ($cabang !== 'semua') {
-            $baseQuery->where('cabang', $cabang);
+            $selectedCabang = \App\Models\Cabang::where('nama_cabang', $cabang)->first();
+            if ($selectedCabang) {
+                $baseQuery->where(function($q) use ($selectedCabang, $cabang) {
+                    $q->where('cabang_id', $selectedCabang->id)
+                      ->orWhere('cabang', $cabang);
+                });
+            } else {
+                $baseQuery->where('cabang', $cabang);
+            }
         }
 
         // ─── Stat Cards ──────────────────────────────────────────────────────
@@ -73,7 +81,15 @@ class DashboardController extends Controller
             $day = $today->copy()->subDays($i);
             $q   = Transaksi::whereDate('tanggal_transaksi', $day);
             if ($cabang !== 'semua') {
-                $q->where('cabang', $cabang);
+                $selectedCabang = \App\Models\Cabang::where('nama_cabang', $cabang)->first();
+                if ($selectedCabang) {
+                    $q->where(function($sub) use ($selectedCabang, $cabang) {
+                        $sub->where('cabang_id', $selectedCabang->id)
+                            ->orWhere('cabang', $cabang);
+                    });
+                } else {
+                    $q->where('cabang', $cabang);
+                }
             }
             $chartData[] = [
                 'label' => $day->format('d/m'),
@@ -88,7 +104,10 @@ class DashboardController extends Controller
             ->get();
 
         // ─── Daftar cabang ────────────────────────────────────────────────────
-        $daftarCabang = ['Suci', 'Cilawu', 'Samarang'];
+        $daftarCabang = \App\Models\Cabang::pluck('nama_cabang')->toArray();
+        if (empty($daftarCabang)) {
+            $daftarCabang = ['Suci', 'Cilawu', 'Samarang'];
+        }
 
         return view('dashboard', compact(
             'user',

@@ -19,8 +19,15 @@ class LaporanController extends Controller
             ->whereBetween('tanggal_transaksi', [$startBulan, $endBulan])
             ->orderBy('tanggal_transaksi', 'desc');
             
-        if (\Illuminate\Support\Facades\Auth::user()->role === 'kepala_cabang') {
-            $query->where('cabang', 'Cabang 1');
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user->role === 'kepala_cabang') {
+            if ($user->cabang_id) {
+                $query->where('cabang_id', $user->cabang_id);
+            } elseif ($user->cabang) {
+                $query->where('cabang', $user->cabang);
+            } else {
+                $query->where('cabang', 'Cilawu');
+            }
         }
 
         $transaksi = $query->get();

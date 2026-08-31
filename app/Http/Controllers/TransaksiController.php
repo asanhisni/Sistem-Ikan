@@ -16,10 +16,15 @@ class TransaksiController extends Controller
         $search = $request->get('search');
         $status = $request->get('status');
 
-        $query = Transaksi::with(['pelanggan', 'ikan'])->orderBy('tanggal_transaksi', 'desc');
+        $user = Auth::user();
+        $query = Transaksi::with(['pelanggan', 'ikan', 'cabangRelasi'])->orderBy('tanggal_transaksi', 'desc');
 
-        if (Auth::user()->role === 'kepala_cabang') {
-            $query->where('cabang', 'Cabang 1'); // Kunci ke cabang 1
+        if ($user->role === 'kepala_cabang') {
+            if ($user->cabang_id) {
+                $query->where('cabang_id', $user->cabang_id);
+            } elseif ($user->cabang) {
+                $query->where('cabang', $user->cabang);
+            }
         }
 
         if ($search) {
@@ -56,6 +61,10 @@ class TransaksiController extends Controller
             'jumlah_kg.required' => 'Jumlah (Kg) harus diisi.',
         ]);
 
+        $user = Auth::user();
+        $userCabangNama = $user->cabangRelasi ? $user->cabangRelasi->nama_cabang : ($user->cabang ?? 'Cilawu');
+        $userCabangId = $user->cabang_id;
+
         $ikan = Ikan::findOrFail($request->ikan_id);
         $total = $ikan->harga_per_kg * $request->jumlah_kg;
         
@@ -75,7 +84,8 @@ class TransaksiController extends Controller
             'status' => $request->status,
             'jumlah_dibayar' => $jumlahDibayar,
             'tanggal_transaksi' => Carbon::now(),
-            'cabang' => Auth::user()->role === 'admin' ? 'Suci' : 'Cabang 1',
+            'cabang' => $userCabangNama,
+            'cabang_id' => $userCabangId,
             'keterangan' => $request->keterangan,
         ]);
         

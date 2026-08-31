@@ -12,7 +12,7 @@ class Transaksi extends Model
     protected $fillable = [
         'pelanggan_id', 'ikan_id', 'pembeli_nama',
         'jumlah_kg', 'harga_per_kg', 'total',
-        'status', 'jumlah_dibayar', 'cabang', 'tanggal_transaksi', 'keterangan',
+        'status', 'jumlah_dibayar', 'cabang', 'cabang_id', 'tanggal_transaksi', 'keterangan',
     ];
 
     protected $casts = [
@@ -27,5 +27,10 @@ class Transaksi extends Model
     public function ikan(): BelongsTo
     {
         return $this->belongsTo(Ikan::class, 'ikan_id');
+    }
+
+    public function cabangRelasi(): BelongsTo
+    {
+        return $this->belongsTo(Cabang::class, 'cabang_id');
     }
 }
