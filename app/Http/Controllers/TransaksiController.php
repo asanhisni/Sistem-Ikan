@@ -144,7 +144,13 @@ class TransaksiController extends Controller
             $transaksi->details()->create($detail);
         }
 
-        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan!');
+        return redirect()->route('transaksi.show', $transaksi->id)->with('success', 'Transaksi berhasil disimpan!');
+    }
+
+    public function show(Transaksi $transaksi)
+    {
+        $transaksi->load(['details.ikan', 'ikan', 'pelanggan', 'cabangRelasi']);
+        return view('transaksi.show', compact('transaksi'));
     }
 
     public function edit(Transaksi $transaksi)

@@ -24,6 +24,7 @@
     
     .form-group {
         margin-bottom: 22px;
+        position: relative;
     }
     
     .form-group label.section-label {
@@ -55,6 +56,56 @@
     .form-control:focus {
         border-color: #f59e0b;
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+    }
+
+    /* AUTOCOMPLETE SUGGESTION BOX */
+    .autocomplete-box {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+        z-index: 100;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        margin-top: 4px;
+    }
+
+    .autocomplete-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 0.15s;
+    }
+
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+        background: #fffbeb;
+    }
+
+    .ac-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .ac-phone {
+        font-size: 12px;
+        font-weight: 600;
+        color: #d97706;
+        background: #fef3c7;
+        padding: 2px 8px;
+        border-radius: 6px;
     }
 
     /* ─── UI PEMILIHAN IKAN CEPAT (GRID CHIPS) ─── */
@@ -469,21 +520,46 @@
         @csrf
         @method('PUT')
         
-        <!-- 1. Pembeli -->
+        <!-- 1. No HP / WhatsApp -->
+        <div class="form-group">
+            <label class="section-label">
+                <i class="fas fa-phone-alt"></i>
+                <span>1. No. HP / WhatsApp Pembeli</span>
+            </label>
+            <input type="text" name="telepon" id="teleponInput" class="form-control" 
+                   placeholder="Contoh: 081234567890 (Ketik no hp untuk autocomplete)" 
+                   value="{{ old('telepon', $transaksi->telepon ?? ($transaksi->pelanggan?->telepon ?? '')) }}" 
+                   autocomplete="off" oninput="searchPelangganByPhone(this.value)">
+            
+            <!-- Box Rekomendasi Pelanggan Terdaftar -->
+            <div id="phoneAutocompleteBox" class="autocomplete-box"></div>
+            
+            <div id="pelangganFoundNotice" style="display: none; margin-top: 6px; font-size: 12px; font-weight: 700; color: #15803d;">
+                <i class="fas fa-check-circle"></i> Pelanggan terdaftar ditemukan!
+            </div>
+        </div>
+
+        <!-- 2. Nama Pembeli -->
         <div class="form-group">
             <label class="section-label">
                 <i class="fas fa-user"></i>
-                <span>1. Nama Pembeli</span>
+                <span>2. Nama Pembeli / Tempat</span>
             </label>
-            <input type="text" name="pembeli_nama" class="form-control" value="{{ old('pembeli_nama', $transaksi->pembeli_nama) }}" required autocomplete="off">
+            <input type="text" name="pembeli_nama" id="pembeliNamaInput" class="form-control" 
+                   value="{{ old('pembeli_nama', $transaksi->pembeli_nama) }}" 
+                   required autocomplete="off" oninput="searchPelangganByName(this.value)">
+            
+            <!-- Box Rekomendasi Pelanggan berdasarkan Nama -->
+            <div id="nameAutocompleteBox" class="autocomplete-box"></div>
+
             @error('pembeli_nama') <div class="error-msg">{{ $message }}</div> @enderror
         </div>
         
-        <!-- 2. Multi Jenis Ikan & Volume -->
+        <!-- 3. Multi Jenis Ikan & Volume -->
         <div class="form-group">
             <label class="section-label">
                 <i class="fas fa-fish"></i>
-                <span>2. Pilih Ikan & Masukkan Kilogram</span>
+                <span>3. Pilih Ikan & Masukkan Kilogram</span>
             </label>
             
             <div class="ikan-picker-card">
@@ -501,7 +577,7 @@
                     @endforeach
                 </div>
 
-                <!-- Daftar Ikan yang Masuk Pesanan (Card Style, Mudah Digeser & Dilihat di Mobile) -->
+                <!-- Daftar Ikan yang Masuk Pesanan -->
                 <div style="font-size: 13px; font-weight: 800; color: #1e293b; margin-top: 16px; display: flex; align-items: center; justify-content: space-between;">
                     <span>Ikan yang dipesan:</span>
                     <span id="labelItemCount" style="font-size: 12px; color: #64748b; font-weight: 600;">(0 jenis)</span>
@@ -531,11 +607,11 @@
             @error('items') <div class="error-msg">{{ $message }}</div> @enderror
         </div>
         
-        <!-- 3. Status Bayar -->
+        <!-- 4. Status Bayar -->
         <div class="form-group">
             <label class="section-label">
                 <i class="fas fa-money-bill-wave"></i>
-                <span>3. Status Pembayaran</span>
+                <span>4. Status Pembayaran</span>
             </label>
             <div class="radio-group" style="flex-wrap: wrap;">
                 <div class="radio-card" style="min-width: 140px;">
@@ -554,16 +630,27 @@
             @error('status') <div class="error-msg">{{ $message }}</div> @enderror
             
             <div class="dp-input-box" id="dp-box">
-                <label style="color: #854d0e; font-size: 13px; font-weight: 700; margin-bottom: 6px; display: block;">Jumlah Uang Muka / DP yang Diterima (Rp)</label>
-                <input type="number" name="jumlah_dibayar" class="form-control" placeholder="Contoh: 500000" value="{{ old('jumlah_dibayar', (int)$transaksi->jumlah_dibayar) }}">
+                <label style="color: #854d0e; font-size: 13px; font-weight: 800; margin-bottom: 6px; display: block;">
+                    <i class="fas fa-hand-holding-usd"></i> Jumlah Uang Muka / DP yang Diterima (Rp)
+                </label>
+                <div style="position: relative;">
+                    <input type="text" id="dpDisplayInput" class="form-control" 
+                           placeholder="Contoh: 50.000 atau 500.000" 
+                           value="{{ old('jumlah_dibayar', $transaksi->jumlah_dibayar > 0 ? number_format((float)$transaksi->jumlah_dibayar, 0, ',', '.') : '') }}" 
+                           oninput="formatRupiahInput(this)" style="font-size: 16px; font-weight: 800; color: #854d0e; letter-spacing: 0.02em;">
+                    <input type="hidden" name="jumlah_dibayar" id="dpRealInput" value="{{ old('jumlah_dibayar', (int)$transaksi->jumlah_dibayar) }}">
+                </div>
+                <div id="dpPreviewHint" style="margin-top: 6px; font-size: 12px; font-weight: 700; color: #a16207; {{ $transaksi->jumlah_dibayar > 0 ? '' : 'display: none;' }}">
+                    Nominal: <span id="dpPreviewText">Rp {{ number_format((float)$transaksi->jumlah_dibayar, 0, ',', '.') }}</span>
+                </div>
             </div>
         </div>
         
-        <!-- 4. Keterangan -->
+        <!-- 5. Keterangan -->
         <div class="form-group">
             <label class="section-label">
                 <i class="fas fa-pencil-alt"></i>
-                <span>4. Catatan Tambahan (Opsional)</span>
+                <span>5. Catatan Tambahan (Opsional)</span>
             </label>
             <input type="text" name="keterangan" class="form-control" value="{{ old('keterangan', $transaksi->keterangan) }}">
         </div>
@@ -605,6 +692,96 @@
 
 @push('scripts')
 <script>
+    // Data master pelanggan dari server
+    const masterPelanggan = @json($pelanggan ?? []);
+
+    function searchPelangganByPhone(query) {
+        const box = document.getElementById('phoneAutocompleteBox');
+        const notice = document.getElementById('pelangganFoundNotice');
+        const cleanQuery = query.replace(/\D/g, '');
+
+        if (cleanQuery.length < 3) {
+            box.style.display = 'none';
+            box.innerHTML = '';
+            notice.style.display = 'none';
+            return;
+        }
+
+        const matches = masterPelanggan.filter(p => {
+            if (!p.telepon) return false;
+            const pPhone = p.telepon.replace(/\D/g, '');
+            return pPhone.includes(cleanQuery);
+        });
+
+        if (matches.length === 0) {
+            box.style.display = 'none';
+            notice.style.display = 'none';
+            return;
+        }
+
+        let html = '';
+        matches.forEach(p => {
+            html += `
+                <div class="autocomplete-item" onclick="selectPelanggan('${p.nama.replace(/'/g, "\\'")}', '${(p.telepon || '').replace(/'/g, "\\'")}')">
+                    <span class="ac-name">${p.nama}</span>
+                    <span class="ac-phone"><i class="fas fa-phone"></i> ${p.telepon}</span>
+                </div>
+            `;
+        });
+
+        box.innerHTML = html;
+        box.style.display = 'block';
+    }
+
+    function searchPelangganByName(query) {
+        const box = document.getElementById('nameAutocompleteBox');
+        if (!query || query.length < 2) {
+            box.style.display = 'none';
+            box.innerHTML = '';
+            return;
+        }
+
+        const qLower = query.toLowerCase();
+        const matches = masterPelanggan.filter(p => p.nama && p.nama.toLowerCase().includes(qLower));
+
+        if (matches.length === 0) {
+            box.style.display = 'none';
+            return;
+        }
+
+        let html = '';
+        matches.forEach(p => {
+            html += `
+                <div class="autocomplete-item" onclick="selectPelanggan('${p.nama.replace(/'/g, "\\'")}', '${(p.telepon || '').replace(/'/g, "\\'")}')">
+                    <span class="ac-name">${p.nama}</span>
+                    ${p.telepon ? `<span class="ac-phone"><i class="fas fa-phone"></i> ${p.telepon}</span>` : ''}
+                </div>
+            `;
+        });
+
+        box.innerHTML = html;
+        box.style.display = 'block';
+    }
+
+    function selectPelanggan(nama, telepon) {
+        document.getElementById('pembeliNamaInput').value = nama;
+        if (telepon) {
+            document.getElementById('teleponInput').value = telepon;
+        }
+        document.getElementById('phoneAutocompleteBox').style.display = 'none';
+        document.getElementById('nameAutocompleteBox').style.display = 'none';
+        document.getElementById('pelangganFoundNotice').style.display = 'block';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#teleponInput') && !e.target.closest('#phoneAutocompleteBox')) {
+            document.getElementById('phoneAutocompleteBox').style.display = 'none';
+        }
+        if (!e.target.closest('#pembeliNamaInput') && !e.target.closest('#nameAutocompleteBox')) {
+            document.getElementById('nameAutocompleteBox').style.display = 'none';
+        }
+    });
+
     let selectedItems = [];
     let pendingIkan = null;
 
@@ -774,9 +951,33 @@
         return true;
     }
 
+    function formatRupiahInput(inputEl) {
+        let val = inputEl.value.replace(/\D/g, ''); // Ambil hanya angka
+        let realInput = document.getElementById('dpRealInput');
+        let hintEl = document.getElementById('dpPreviewHint');
+        let previewText = document.getElementById('dpPreviewText');
+
+        if (!val) {
+            inputEl.value = '';
+            realInput.value = '';
+            hintEl.style.display = 'none';
+            return;
+        }
+
+        realInput.value = val;
+        let formatted = Number(val).toLocaleString('id-ID');
+        inputEl.value = formatted;
+
+        previewText.textContent = 'Rp ' + formatted;
+        hintEl.style.display = 'block';
+    }
+
     function toggleDpInput() {
-        var isDp = document.getElementById('st_dp').checked;
-        document.getElementById('dp-box').style.display = isDp ? 'block' : 'none';
+        var dpRadio = document.getElementById('st_dp');
+        var dpBox = document.getElementById('dp-box');
+        if (dpRadio && dpBox) {
+            dpBox.style.display = dpRadio.checked ? 'block' : 'none';
+        }
     }
 
     renderItems();

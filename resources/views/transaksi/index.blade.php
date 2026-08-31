@@ -385,6 +385,11 @@
                     <tr>
                         <td>
                             <div class="nama-pembeli">{{ $t->pembeli_nama }}</div>
+                            @if($t->telepon)
+                                <div style="font-size: 12px; color: #0284c7; font-weight: 600; margin-top: 2px;">
+                                    <i class="fas fa-phone-alt" style="font-size: 10px;"></i> {{ $t->telepon }}
+                                </div>
+                            @endif
                             <div class="tgl-transaksi"><i class="fas fa-calendar-alt"></i> {{ $t->tanggal_transaksi->format('d M Y - H:i') }}</div>
                         </td>
                         <td>
@@ -422,6 +427,7 @@
                             @endif
                         </td>
                         <td>
+                            <a href="{{ route('transaksi.show', $t->id) }}" class="btn-aksi" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                             <a href="{{ route('transaksi.edit', $t->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
                             <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
                                 @csrf
@@ -449,7 +455,14 @@
         @forelse($transaksi as $t)
         <div class="mobile-card">
             <div class="mobile-head">
-                <div class="mobile-name">{{ $t->pembeli_nama }}</div>
+                <div>
+                    <div class="mobile-name">{{ $t->pembeli_nama }}</div>
+                    @if($t->telepon)
+                        <div style="font-size: 12px; color: #0284c7; font-weight: 600; margin-top: 2px;">
+                            <i class="fas fa-phone-alt" style="font-size: 10px;"></i> {{ $t->telepon }}
+                        </div>
+                    @endif
+                </div>
                 <div class="mobile-total">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
             </div>
             <div class="mobile-meta">
@@ -477,6 +490,7 @@
                 </div>
             </div>
             <div class="mobile-actions">
+                <a href="{{ route('transaksi.show', $t->id) }}" class="mobile-btn" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                 <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
                 <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
                     @csrf
