@@ -403,12 +403,6 @@
                 <i class="fas fa-search"></i> TAMPILKAN
             </button>
         </form>
-
-        @if(Auth::user()->role === 'kepala_cabang')
-        <button class="btn-filter" onclick="alert('Laporan bulan ini telah dikirim ke Pusat secara otomatis!')" style="background: #059669;">
-            <i class="fas fa-paper-plane"></i> KIRIM LAPORAN
-        </button>
-        @endif
     </div>
 
     <!-- 4 SUMMARY CARDS (Tampilan 2x2 di Mobile) -->

@@ -28,7 +28,14 @@ class TransaksiController extends Controller
         }
 
         if ($search) {
-            $query->where('pembeli_nama', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('pembeli_nama', 'like', "%{$search}%")
+                  ->orWhere('telepon', 'like', "%{$search}%")
+                  ->orWhereHas('pelanggan', function ($qp) use ($search) {
+                      $qp->where('telepon', 'like', "%{$search}%")
+                         ->orWhere('nama', 'like', "%{$search}%");
+                  });
+            });
         }
 
         if ($status) {

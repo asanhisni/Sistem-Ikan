@@ -40,6 +40,71 @@
 
         html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
 
+        /* ─── GLOBAL LOADER INDIKATOR (FLIP LOGO 3D + BLUR) ─── */
+        .app-loader-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+        }
+
+        .app-loader-overlay.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .app-flip-logo-box {
+            width: 86px;
+            height: 86px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .app-flip-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: appLogo3DFlip 1.8s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(2, 62, 138, 0.25));
+        }
+
+        @keyframes appLogo3DFlip {
+            0% {
+                transform: rotateY(0deg) scale(1);
+            }
+            50% {
+                transform: rotateY(180deg) scale(1.12);
+            }
+            100% {
+                transform: rotateY(360deg) scale(1);
+            }
+        }
+
+        .app-loader-label {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #03045e;
+            text-transform: uppercase;
+            animation: appPulseText 1.4s ease-in-out infinite alternate;
+        }
+
+        @keyframes appPulseText {
+            0% { opacity: 0.6; transform: translateY(0); }
+            100% { opacity: 1; transform: translateY(-2px); }
+        }
+
         /* ══════════════════════════════════════════
            SIDEBAR
         ══════════════════════════════════════════ */
@@ -69,11 +134,18 @@
         }
 
         .brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            width: 40px; height: 40px;
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .brand-name {
@@ -181,22 +253,24 @@
         ══════════════════════════════════════════ */
         .topbar {
             height: var(--topbar-h);
-            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,252,255,0.8));
-            border-bottom: none;
+            background: rgba(13, 27, 42, 0.88);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 28px;
             position: sticky; top: 0;
             z-index: 50;
-            box-shadow: 0 6px 20px rgba(11,35,60,0.04);
-            backdrop-filter: blur(6px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .topbar-title {
             font-size: 18px;
             font-weight: 700;
-            color: var(--text);
+            color: #ffffff;
+            letter-spacing: -0.02em;
         }
 
         .topbar-right {
@@ -210,6 +284,15 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+            position: relative;
+            user-select: none;
+            padding: 4px 6px;
+            border-radius: 12px;
+            transition: background 0.15s ease;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .avatar {
@@ -218,11 +301,88 @@
             background: linear-gradient(135deg, #1e88e5, #42a5f5);
             display: flex; align-items: center; justify-content: center;
             font-size: 15px; color: #fff; font-weight: 700;
+            box-shadow: 0 4px 12px rgba(30,136,229,0.25);
+            transition: transform 0.15s ease;
+        }
+
+        .user-info:hover .avatar {
+            transform: scale(1.05);
         }
 
         .user-details { text-align: right; }
-        .user-name    { font-size: 14px; font-weight: 600; color: var(--text); }
-        .user-role    { font-size: 11px; color: var(--text-muted); }
+        .user-name    { font-size: 14px; font-weight: 700; color: #ffffff; }
+        .user-role    { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
+
+        /* ─── DROPDOWN MENU USER PROFILE ─── */
+        .user-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+            padding: 8px;
+            display: none;
+            z-index: 9999;
+            animation: dropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .user-dropdown-menu.show {
+            display: block;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .user-dropdown-header {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .user-dropdown-header .dropdown-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .user-dropdown-header .dropdown-role {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            border-radius: 10px;
+            color: #e53935;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .user-dropdown-item:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
 
         /* ══════════════════════════════════════════
            PAGE CONTENT
@@ -241,7 +401,7 @@
             background: none;
             border: none;
             font-size: 20px;
-            color: var(--text);
+            color: #ffffff;
             cursor: pointer;
             padding: 6px;
             line-height: 1;
@@ -289,10 +449,12 @@
             .topbar {
                 padding: 0 14px;
                 height: 58px;
+                background: rgba(13, 27, 42, 0.92);
             }
             .topbar-title {
                 font-size: 15px;
                 margin-left: 4px;
+                color: #ffffff;
             }
             .topbar-right {
                 display: flex;
@@ -384,6 +546,14 @@
 </head>
 <body>
 
+<!-- GLOBAL LOADER INDIKATOR (Semua Halaman) -->
+<div class="app-loader-overlay" id="appGlobalLoader">
+    <div class="app-flip-logo-box">
+        <img src="{{ asset('logo/logo_ikan.png') }}" alt="Loading..." class="app-flip-logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3050/3050247.png'">
+    </div>
+    <div class="app-loader-label">Memuat Sistem...</div>
+</div>
+
 <!-- Sidebar Overlay (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
@@ -391,7 +561,9 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="brand-top">
-            <div class="brand-icon">🐟</div>
+            <div class="brand-icon">
+                <img src="{{ asset('logo/logo_ikan.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='🐟'">
+            </div>
             <span class="brand-name">SAMI JAYA</span>
         </div>
         <div class="brand-desc">Sistem Pencatatan &amp; Monitoring Transaksi</div>
@@ -429,16 +601,6 @@
             Laporan
         </a>
     </nav>
-
-    <div class="sidebar-footer">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Keluar dari Sistem</span>
-            </button>
-        </form>
-    </div>
 </aside>
 
 <!-- ══════════════ MAIN ══════════════ -->
@@ -451,12 +613,29 @@
             <h1 class="topbar-title">@yield('page-title', 'Dashboard')</h1>
         </div>
         <div class="topbar-right">
-            <div class="user-info">
+            <div class="user-info" id="userProfileToggle" onclick="toggleUserDropdown(event)">
                 <div class="user-details">
                     <div class="user-name">{{ Auth::user()->name }}</div>
                     <div class="user-role">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'Kepala Cabang' }}</div>
                 </div>
                 <div class="avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                <i class="fas fa-chevron-down" style="font-size: 11px; color: rgba(255,255,255,0.7); margin-left: 2px;"></i>
+
+                <!-- DROPDOWN CONTENT -->
+                <div class="user-dropdown-menu" id="userDropdownMenu" onclick="event.stopPropagation()">
+                    <div class="user-dropdown-header">
+                        <div class="dropdown-name">{{ Auth::user()->name }}</div>
+                        <div class="dropdown-role">{{ Auth::user()->role === 'admin' ? 'Administrator' : (Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? 'Kepala Cabang')) }}</div>
+                    </div>
+
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="user-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Keluar dari Sistem</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -506,12 +685,39 @@
     function closeSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        if (!sidebar || !overlay) return;
-        sidebar.classList.remove('open');
-        overlay.classList.remove('open');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
     }
-</script>
 
+    // Toggle Dropdown User Topbar
+    function toggleUserDropdown(event) {
+        event.stopPropagation();
+        const menu = document.getElementById('userDropdownMenu');
+        if (menu) {
+            menu.classList.toggle('show');
+        }
+    }
+
+    // Tutup Dropdown jika klik di luar
+    window.addEventListener('click', function(e) {
+        const menu = document.getElementById('userDropdownMenu');
+        const toggle = document.getElementById('userProfileToggle');
+        if (menu && menu.classList.contains('show') && toggle && !toggle.contains(e.target)) {
+            menu.classList.remove('show');
+        }
+    });
+
+    // Auto-dismiss Loader di semua halaman saat dokumen selesai dimuat
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const loader = document.getElementById('appGlobalLoader');
+            if (loader) {
+                loader.classList.add('fade-out');
+                setTimeout(() => loader.remove(), 500);
+            }
+        }, 300);
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

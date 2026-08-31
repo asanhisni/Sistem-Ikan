@@ -355,7 +355,7 @@
         </a>
 
         <form class="search-form" method="GET" action="{{ route('transaksi.index') }}">
-            <input type="text" name="search" placeholder="Cari nama pembeli..." value="{{ $search ?? '' }}">
+            <input type="text" name="search" placeholder="Cari nama atau no HP..." value="{{ $search ?? '' }}">
             <select name="status">
                 <option value="">Semua Status</option>
                 <option value="lunas" {{ ($status ?? '') == 'lunas' ? 'selected' : '' }}>Lunas</option>

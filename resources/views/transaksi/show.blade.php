@@ -197,15 +197,31 @@
         margin-top: 18px;
     }
 
-    /* Floating sticky share bar di bawah layar */
+    /* Floating sticky share bar di bawah layar (di atas bottom nav) */
     .floating-share-bar {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 999;
-        padding: 12px 16px 20px;
-        background: linear-gradient(to top, rgba(255,255,255,1) 70%, rgba(255,255,255,0));
+        z-index: 1050;
+        padding: 12px 16px 16px;
+        background: linear-gradient(to top, rgba(255,255,255,1) 75%, rgba(255,255,255,0));
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+        .floating-share-bar {
+            bottom: 64px; /* Naikkan tepat di atas mobile bottom-nav */
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+        }
+        .struk-page-wrapper {
+            padding-bottom: 140px; /* Jarak aman scroll di mobile */
+        }
     }
 
     .btn-img-wa {

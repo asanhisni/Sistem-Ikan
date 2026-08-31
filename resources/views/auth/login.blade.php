@@ -112,15 +112,13 @@
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 28px 24px;
+            background: #ffffff;
+            border: none;
+            border-radius: 24px;
+            padding: 32px 28px;
             box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+                0 20px 60px rgba(0, 0, 0, 0.35),
+                0 8px 20px rgba(0, 0, 0, 0.2);
             animation: cardAppear 0.5s ease-out both;
         }
 
@@ -136,36 +134,36 @@
         }
 
         .logo-icon {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 16px var(--accent-glow);
+            width: 86px;
+            height: 86px;
+            margin: 0 auto 12px;
+            background: transparent;
+            box-shadow: none;
+            border: none;
         }
 
-        .logo-icon i {
-            font-size: 24px;
-            color: #fff;
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .app-title {
             font-size: 22px;
             font-weight: 800;
-            color: #fff;
+            color: #0f172a;
             letter-spacing: -0.5px;
             margin-bottom: 4px;
         }
 
         .app-subtitle {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: #64748b;
         }
 
-        /* ── Divider ── */
         .divider {
             display: flex;
             align-items: center;
@@ -176,13 +174,13 @@
         .divider-line {
             flex: 1;
             height: 1px;
-            background: var(--border);
+            background: #e2e8f0;
         }
 
         .divider-text {
             font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: #94a3b8;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -194,11 +192,11 @@
 
         .form-label {
             display: block;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.08em;
             margin-bottom: 6px;
         }
 
@@ -211,7 +209,7 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
+            color: #94a3b8;
             font-size: 14px;
             pointer-events: none;
         }
@@ -219,23 +217,24 @@
         .form-input {
             width: 100%;
             padding: 12px 14px 12px 40px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
             border-radius: 10px;
-            color: #fff;
+            color: #0f172a;
             font-size: 14px;
+            font-weight: 600;
             outline: none;
             transition: all 0.2s ease;
         }
 
         .form-input::placeholder {
-            color: rgba(202, 240, 248, 0.35);
+            color: #94a3b8;
         }
 
         .form-input:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: #fff;
+            border-color: #0077b6;
+            box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.12);
         }
 
         .input-icon-right {
@@ -244,7 +243,7 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: var(--text-secondary);
+            color: #94a3b8;
             font-size: 14px;
         }
 
@@ -300,7 +299,8 @@
 
         .checkbox-wrap span {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: #475569;
+            font-weight: 600;
         }
 
         /* ── Submit Button ── */
@@ -349,10 +349,10 @@
             <!-- Logo & Title -->
             <div class="logo-area">
                 <div class="logo-icon">
-                    <i class="fas fa-fish"></i>
+                    <img src="{{ asset('logo/logo_ikan.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-fish\' style=\'font-size:38px;color:#90e0ef;\'></i>'">
                 </div>
-                <h1 class="app-title">PT. Pelopor Sami Jaya</h1>
-                <p class="app-subtitle">Sistem pencatatan & Monitoring penjualan ikan
+                <h1 class="app-title">PT. PELOPOR SAMI JAYA</h1>
+                <p class="app-subtitle">Sistem pencatatan &amp; Monitoring penjualan ikan</p>
             </div>
 
             <div class="divider">
