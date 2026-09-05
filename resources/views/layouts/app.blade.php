@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') | Sistem Ikan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,22 @@
             --glass:        rgba(255,255,255,0.6);
         }
 
-        html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        html, body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            touch-action: manipulation;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        /* Cegah auto-zoom pada iOS input focus */
+        @media (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
 
         /* ─── GLOBAL LOADER INDIKATOR (FLIP LOGO 3D + BLUR) ─── */
         .app-loader-overlay {
@@ -716,6 +731,25 @@
                 setTimeout(() => loader.remove(), 500);
             }
         }, 300);
+    });
+
+    // ─── DISABLE ZOOM PADA MOBILE / SMARTPHONE ───
+    // Cegah multi-touch pinch-to-zoom di iOS Safari & browser mobile
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Cegah gesture pinch zoom spesifik Safari iOS
+    document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+        e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+        e.preventDefault();
     });
 </script>
 @stack('scripts')

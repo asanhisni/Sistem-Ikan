@@ -8,112 +8,215 @@
     .form-container {
         max-width: 680px;
         margin: 0 auto;
+        padding-bottom: 40px;
     }
+
     .back-link {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: var(--text-muted);
+        color: #64748b;
         text-decoration: none;
         font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        transition: color 0.15s;
+        font-weight: 700;
+        margin-bottom: 18px;
+        transition: color 0.15s ease;
     }
-    .back-link:hover { color: var(--blue); }
+
+    .back-link:hover {
+        color: #2563eb;
+    }
 
     .form-card {
-        background: #fff;
+        background: #ffffff;
         border-radius: 20px;
-        box-shadow: var(--elev);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
         overflow: hidden;
-        border: 1px solid rgba(11,35,60,0.04);
+        border: 1px solid #eef2f6;
     }
+
+    /* ─── HEADER (NAVY / BLUE TEMA APLIKASI) ─── */
     .form-card-header {
-        padding: 28px 32px 24px;
-        background: linear-gradient(135deg, #43a047, #66bb6a);
-        color: #fff;
+        padding: 24px 28px;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #ffffff;
         display: flex;
         align-items: center;
         gap: 16px;
     }
+
     .form-card-header-avatar {
-        width: 52px; height: 52px;
+        width: 52px;
+        height: 52px;
         border-radius: 14px;
-        background: rgba(255,255,255,0.25);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 22px; font-weight: 800;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
         flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     }
-    .form-card-header h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-    .form-card-header p  { font-size: 13px; opacity: 0.85; }
-    .form-body { padding: 32px; }
+
+    .form-card-header-text h3 {
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 4px 0;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+    }
+
+    .form-card-header-text p {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .form-card-header-text .header-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        font-size: 11px;
+        color: #cbd5e1;
+        font-weight: 600;
+    }
+
+    /* ─── BODY & SECTIONS ─── */
+    .form-body {
+        padding: 28px 30px;
+    }
+
+    @media (max-width: 640px) {
+        .form-body {
+            padding: 20px 18px;
+        }
+        .form-card-header {
+            padding: 20px 18px;
+        }
+    }
 
     .form-section-title {
         font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 1px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 16px;
+        color: #475569;
+        margin-bottom: 18px;
         padding-bottom: 8px;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1.5px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-        display: block;
+
+    .form-section-title i {
+        color: #2563eb;
         font-size: 13px;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 7px;
     }
-    .form-group label span.req { color: var(--red); margin-left: 3px; }
+
+    .form-section-divider {
+        margin-top: 32px;
+    }
+
+    /* ─── FORM GROUP & CONTROLS ─── */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .form-group label span.req {
+        color: #ef4444;
+        margin-left: 3px;
+    }
+
     .form-group label .opt-badge {
         font-size: 11px;
-        background: #f3f4f6;
-        color: var(--text-muted);
+        background: #f1f5f9;
+        color: #64748b;
         padding: 2px 8px;
         border-radius: 20px;
-        margin-left: 6px;
+        margin-left: 8px;
         font-weight: 600;
     }
+
     .form-control {
         width: 100%;
-        padding: 11px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: 'Inter', sans-serif;
-        color: var(--text);
-        background: #fff;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-control:focus {
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14.5px;
+        font-family: inherit;
+        color: #0f172a;
+        background: #ffffff;
         outline: none;
-        border-color: var(--green);
-        box-shadow: 0 0 0 3px rgba(67,160,71,0.1);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
     }
-    .form-control.is-invalid { border-color: var(--red); }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        background: #ffffff;
+    }
+
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        background: #fffcfc;
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
     .invalid-feedback {
         display: block;
         font-size: 12px;
-        color: var(--red);
-        margin-top: 5px;
+        color: #ef4444;
+        margin-top: 6px;
         font-weight: 600;
     }
+
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 16px;
     }
-    @media(max-width:600px){ .form-row { grid-template-columns: 1fr; } }
 
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+    }
+
+    /* ─── PASSWORD INPUT ─── */
     .password-wrap {
         position: relative;
     }
+
     .password-wrap .form-control {
-        padding-right: 42px;
+        padding-right: 44px;
     }
+
     .password-toggle {
         position: absolute;
         right: 12px;
@@ -121,89 +224,140 @@
         transform: translateY(-50%);
         background: none;
         border: none;
-        color: var(--text-muted);
+        color: #94a3b8;
         cursor: pointer;
-        font-size: 14px;
-        padding: 4px;
-        transition: color 0.15s;
+        font-size: 15px;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.15s ease;
     }
-    .password-toggle:hover { color: var(--green); }
 
-    .cabang-info-box {
-        margin-top: 10px;
-        padding: 12px 16px;
-        background: var(--green-light);
-        border-radius: 10px;
-        font-size: 13px;
-        color: var(--green);
-        font-weight: 600;
+    .password-toggle:hover {
+        color: #2563eb;
     }
-    .cabang-info-box i { margin-right: 6px; }
 
     .password-hint {
         font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 6px;
+        color: #64748b;
+        margin-top: 8px;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
     }
 
+    .password-hint i {
+        color: #3b82f6;
+    }
+
+    /* ─── CABANG INFO BOX ─── */
+    .cabang-info-box {
+        margin-top: 10px;
+        padding: 12px 16px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        font-size: 13px;
+        color: #1e40af;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ─── FOOTER ─── */
     .form-footer {
-        padding: 24px 32px;
-        border-top: 1px solid var(--border);
+        padding: 20px 30px;
+        border-top: 1px solid #f1f5f9;
+        background: #f8fafc;
         display: flex;
         gap: 12px;
         justify-content: flex-end;
     }
+
     .btn-submit {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        padding: 12px 28px;
-        background: linear-gradient(135deg, #43a047, #66bb6a);
-        color: #fff;
+        padding: 12px 26px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
         border: none;
         border-radius: 12px;
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 6px 20px rgba(67,160,71,0.28);
-        transition: all 0.2s;
-        font-family: 'Inter', sans-serif;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+        transition: all 0.2s ease;
+        font-family: inherit;
     }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(67,160,71,0.38); }
+
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        color: #ffffff;
+    }
+
+    .btn-submit:active {
+        transform: scale(0.98);
+    }
+
     .btn-cancel {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        padding: 12px 24px;
-        background: #f3f4f6;
-        color: var(--text);
-        border: none;
+        padding: 12px 22px;
+        background: #ffffff;
+        color: #475569;
+        border: 1.5px solid #e2e8f0;
         border-radius: 12px;
         font-size: 14px;
         font-weight: 700;
         text-decoration: none;
-        transition: all 0.15s;
-        font-family: 'Inter', sans-serif;
+        transition: all 0.15s ease;
+        font-family: inherit;
     }
-    .btn-cancel:hover { background: #e5e7eb; }
+
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    @media (max-width: 640px) {
+        .form-footer {
+            flex-direction: column-reverse;
+            padding: 16px 18px;
+        }
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="form-container">
     <a href="{{ route('users.index') }}" class="back-link">
-        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+        <i class="fas fa-arrow-left"></i>
+        <span>Kembali ke Daftar</span>
     </a>
 
     <div class="form-card">
+        <!-- Header Card: Navy Theme -->
         <div class="form-card-header">
             <div class="form-card-header-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-            <div>
+            <div class="form-card-header-text">
                 <h3>Edit Kepala Cabang</h3>
-                <p>{{ $user->name }} · @{{ $user->username }}</p>
+                <p>
+                    <span>{{ $user->name }}</span>
+                    <span>·</span>
+                    <span>{{ '@' . $user->username }}</span>
+                    <span class="header-badge">Kepala Cabang</span>
+                </p>
             </div>
         </div>
 
@@ -212,8 +366,11 @@
             @method('PUT')
             <div class="form-body">
 
-                <!-- Informasi Akun -->
-                <div class="form-section-title">Informasi Akun</div>
+                <!-- 1. INFORMASI AKUN -->
+                <div class="form-section-title">
+                    <i class="fas fa-user"></i>
+                    <span>Informasi Akun</span>
+                </div>
 
                 <div class="form-group">
                     <label for="name">Nama Lengkap <span class="req">*</span></label>
@@ -240,8 +397,11 @@
                     </div>
                 </div>
 
-                <!-- Ganti Password -->
-                <div class="form-section-title" style="margin-top:8px;">Ganti Password</div>
+                <!-- 2. GANTI PASSWORD -->
+                <div class="form-section-title form-section-divider">
+                    <i class="fas fa-lock"></i>
+                    <span>Ganti Password</span>
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -252,27 +412,33 @@
                         <div class="password-wrap">
                             <input type="password" class="form-control @error('password') is-invalid @enderror"
                                    id="password" name="password" placeholder="Kosongkan jika tidak diganti">
-                            <button type="button" class="password-toggle" onclick="togglePwd('password','eye1')">
+                            <button type="button" class="password-toggle" onclick="togglePwd('password','eye1')" title="Lihat Password">
                                 <i class="fas fa-eye" id="eye1"></i>
                             </button>
                         </div>
                         @error('password')<span class="invalid-feedback">{{ $message }}</span>@enderror
-                        <div class="password-hint"><i class="fas fa-info-circle"></i> Kosongkan jika tidak ingin mengganti password.</div>
+                        <div class="password-hint">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Kosongkan jika tidak ingin mengganti password.</span>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="password_confirmation">Konfirmasi Password Baru</label>
                         <div class="password-wrap">
                             <input type="password" class="form-control"
                                    id="password_confirmation" name="password_confirmation" placeholder="Ulangi password baru">
-                            <button type="button" class="password-toggle" onclick="togglePwd('password_confirmation','eye2')">
+                            <button type="button" class="password-toggle" onclick="togglePwd('password_confirmation','eye2')" title="Lihat Password">
                                 <i class="fas fa-eye" id="eye2"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Penempatan Cabang -->
-                <div class="form-section-title" style="margin-top:8px;">Penempatan Cabang</div>
+                <!-- 3. PENEMPATAN CABANG -->
+                <div class="form-section-title form-section-divider">
+                    <i class="fas fa-store"></i>
+                    <span>Penempatan Cabang</span>
+                </div>
 
                 <div class="form-group">
                     <label for="cabang_id">Cabang Ditugaskan <span class="req">*</span></label>
@@ -299,10 +465,12 @@
 
             <div class="form-footer">
                 <a href="{{ route('users.index') }}" class="btn-cancel">
-                    <i class="fas fa-times"></i> Batal
+                    <i class="fas fa-times"></i>
+                    <span>Batal</span>
                 </a>
                 <button type="submit" class="btn-submit" id="btn-update-kepala">
-                    <i class="fas fa-save"></i> Simpan Perubahan
+                    <i class="fas fa-save"></i>
+                    <span>Simpan Perubahan</span>
                 </button>
             </div>
         </form>
@@ -333,7 +501,7 @@ function showCabangInfo() {
         const lokasi = option.getAttribute('data-lokasi');
         const kode   = option.getAttribute('data-kode');
         infoText.textContent = `Kode: ${kode} · Lokasi: ${lokasi || 'Belum diatur'}`;
-        infoBox.style.display = 'block';
+        infoBox.style.display = 'flex';
     } else {
         infoBox.style.display = 'none';
     }

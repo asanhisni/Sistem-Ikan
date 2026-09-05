@@ -39,10 +39,15 @@ class TransaksiController extends Controller
         }
 
         if ($status) {
-            $query->where('status', $status);
+            if ($status === 'belum_lunas') {
+                // DP juga termasuk belum lunas
+                $query->whereIn('status', ['belum_lunas', 'dp']);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
-        $transaksi = $query->paginate(10);
+        $transaksi = $query->paginate(10)->withQueryString();
         return view('transaksi.index', compact('transaksi', 'search', 'status'));
     }
 

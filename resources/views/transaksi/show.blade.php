@@ -262,22 +262,7 @@
         50%       { transform: scale(1.5); opacity: 0.6; }
     }
 
-    /* Progress bar render */
-    .render-progress-bar {
-        height: 3px;
-        background: #e2e8f0;
-        border-radius: 999px;
-        overflow: hidden;
-        margin-bottom: 8px;
-    }
 
-    .render-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #25d366, #128c7e);
-        border-radius: 999px;
-        width: 0%;
-        transition: width 0.3s ease;
-    }
 
     .btn-secondary-action {
         display: flex;
@@ -364,7 +349,7 @@
         <!-- HEADER LOGO + NAMA TOKO -->
         <div class="receipt-header">
             <img src="{{ asset('logo/logo_ikan.png') }}" alt="Logo" class="receipt-header-logo" crossorigin="anonymous" onerror="this.style.display='none'">
-            <div class="receipt-store-name">SISTEM IKAN FRESH</div>
+            <div class="receipt-store-name">PT. PELOPOR SAMI JAYA</div>
             <div class="receipt-store-sub">
                 📍 Cabang: {{ $transaksi->cabangRelasi ? $transaksi->cabangRelasi->nama_cabang : ($transaksi->cabang ?? 'Pusat') }}
             </div>
@@ -481,14 +466,15 @@
 
 <!-- ════ FLOATING SHARE BAR (sticky bawah layar) ════ -->
 <div class="floating-share-bar">
-    <!-- Progress bar saat render berjalan -->
-    <div class="render-progress-bar" id="renderProgressBar" style="display: none;">
-        <div class="render-progress-fill" id="renderProgressFill"></div>
-    </div>
-
-    <button type="button" class="btn-img-wa loading" id="btnBuatGambar" onclick="kirimStrukWA()" disabled>
+    <button type="button" class="btn-img-wa" id="btnBuatGambar" onclick="kirimStrukWA()">
         <i class="fab fa-whatsapp" style="font-size: 22px;"></i>
-        <span id="btnShareText">⏳ Menyiapkan struk...</span>
+        <span id="btnShareText">
+            @if($transaksi->telepon)
+                <span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE {{ $transaksi->telepon }}&nbsp;<i class="fab fa-whatsapp"></i>
+            @else
+                <span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE WHATSAPP
+            @endif
+        </span>
     </button>
 </div>
 @php
@@ -503,172 +489,85 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     const waPhoneNumber = "{{ $formattedWaNumber }}";
-    const receiptFileName = "struk-TRX-{{ str_pad($transaksi->id, 5, '0', STR_PAD_LEFT) }}.png";
-    const phoneLabel = "{{ $transaksi->telepon ?? '' }}";
+    const phoneLabel    = "{{ $transaksi->telepon ?? '' }}";
 
-    let renderedBlob = null;  // Blob gambar yang sudah dirender
-    let isRendering = false;
-
-    // ── Auto-render saat halaman dimuat ──────────────────────────────────────
-    window.addEventListener('load', function() {
-        // Tunggu 600ms biar halaman tampil dulu
-        setTimeout(autoRenderStruk, 600);
-    });
-
-    async function autoRenderStruk() {
-        if (isRendering) return;
-        isRendering = true;
-
-        const btn  = document.getElementById('btnBuatGambar');
-        const text = document.getElementById('btnShareText');
-        const progressBar  = document.getElementById('renderProgressBar');
-        const progressFill = document.getElementById('renderProgressFill');
-
-        // Tampilkan progress bar
-        progressBar.style.display = 'block';
-        let prog = 0;
-        const progTimer = setInterval(() => {
-            prog = Math.min(prog + Math.random() * 18, 85);
-            progressFill.style.width = prog + '%';
-        }, 200);
-
-        try {
-            const receiptEl = document.getElementById('receiptCard');
-            const canvas = await html2canvas(receiptEl, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff',
-                logging: false,
-                removeContainer: true,
-            });
-
-            clearInterval(progTimer);
-            progressFill.style.width = '100%';
-
-            canvas.toBlob(function(blob) {
-                renderedBlob = blob;
-
-                // Progress selesai, sembunyikan
-                setTimeout(() => { progressBar.style.display = 'none'; }, 400);
-
-                // Aktifkan tombol share
-                btn.classList.remove('loading');
-                btn.disabled = false;
-
-                if (phoneLabel) {
-                    text.innerHTML = `<span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE ${phoneLabel} &nbsp;<i class="fab fa-whatsapp"></i>`;
-                } else {
-                    text.innerHTML = `<span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE WHATSAPP&nbsp;<i class="fab fa-whatsapp"></i>`;
-                }
-
-                // Pulse animasi tombol sekali
-                btn.style.transform = 'scale(1.02)';
-                setTimeout(() => { btn.style.transform = ''; }, 300);
-
-            }, 'image/png', 1.0);
-
-        } catch(err) {
-            clearInterval(progTimer);
-            console.error('Render error:', err);
-            progressBar.style.display = 'none';
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            text.textContent = '⚠️ Coba kirim (tap di sini)';
-            // Fallback: render on demand
-            btn.onclick = buatGambarDanKirimWA;
-        }
-
-        isRendering = false;
-    }
-
-    // ── Tombol share yang sudah ready (gambar sudah dirender) ────────────────
-    async function kirimStrukWA() {
-        if (!renderedBlob) {
-            // Gambar belum siap, render dulu
-            return buatGambarDanKirimWA();
-        }
-
+    function kirimStrukWA() {
         const btn  = document.getElementById('btnBuatGambar');
         const text = document.getElementById('btnShareText');
 
+        // ── Bangun teks struk ──
+        @php
+            $cabangNama = $transaksi->cabangRelasi ? $transaksi->cabangRelasi->nama_cabang : ($transaksi->cabang ?? 'Pusat');
+            $noStruk    = '#TRX-' . str_pad($transaksi->id, 5, '0', STR_PAD_LEFT);
+            $tgl        = $transaksi->tanggal_transaksi->format('d M Y, H:i') . ' WIB';
+        @endphp
+
+        let teks = '';
+        teks += '🐟 *STRUK PEMBELIAN - PT. PELOPOR SAMI JAYA* 🐟\n';
+        teks += '📍 Cabang: *{{ $cabangNama }}*\n';
+        teks += '━━━━━━━━━━━━━━━━━━━━\n';
+        teks += `No. Struk : *{{ $noStruk }}*\n`;
+        teks += `Tanggal   : {{ $tgl }}\n`;
+        teks += `Pembeli   : *{{ $transaksi->pembeli_nama }}*\n`;
+        @if($transaksi->telepon)
+        teks += `No. HP    : {{ $transaksi->telepon }}\n`;
+        @endif
+        teks += '━━━━━━━━━━━━━━━━━━━━\n';
+        teks += '*Rincian Pesanan:*\n';
+
+        @if($transaksi->details && $transaksi->details->count() > 0)
+            @foreach($transaksi->details as $d)
+            teks += `• *{{ $d->ikan ? $d->ikan->nama_ikan : 'Ikan' }}*\n`;
+            teks += `  {{ number_format($d->jumlah_kg, 1, ',', '') }} Kg × Rp {{ number_format($d->harga_per_kg, 0, ',', '.') }} = *Rp {{ number_format($d->subtotal, 0, ',', '.') }}*\n`;
+            @endforeach
+        @else
+            teks += `• *{{ $transaksi->ikan ? $transaksi->ikan->nama_ikan : 'Ikan' }}*\n`;
+            teks += `  {{ number_format($transaksi->jumlah_kg, 1, ',', '') }} Kg × Rp {{ number_format($transaksi->harga_per_kg, 0, ',', '.') }} = *Rp {{ number_format($transaksi->total, 0, ',', '.') }}*\n`;
+        @endif
+
+        teks += '━━━━━━━━━━━━━━━━━━━━\n';
+        teks += `Total Volume : {{ number_format($transaksi->jumlah_kg, 1, ',', '') }} Kg\n`;
+        teks += `*TOTAL BAYAR : Rp {{ number_format($transaksi->total, 0, ',', '.') }}*\n`;
+
+        @if($transaksi->status === 'dp')
+        teks += `✅ Dibayar DP  : Rp {{ number_format($transaksi->jumlah_dibayar, 0, ',', '.') }}\n`;
+        teks += `⚠️ Sisa Tagihan: *Rp {{ number_format($transaksi->total - $transaksi->jumlah_dibayar, 0, ',', '.') }}*\n`;
+        teks += '🟡 Status: *BAYAR DP — BELUM LUNAS*\n';
+        @elseif($transaksi->status === 'lunas')
+        teks += '✅ Status: *PEMBAYARAN LUNAS*\n';
+        @else
+        teks += `❌ Tunggakan: *Rp {{ number_format($transaksi->total, 0, ',', '.') }}*\n`;
+        teks += '🔴 Status: *BELUM DIBAYAR*\n';
+        @endif
+
+        @if($transaksi->keterangan)
+        teks += `\n📝 Catatan: _{{ $transaksi->keterangan }}_\n`;
+        @endif
+
+        teks += '━━━━━━━━━━━━━━━━━━━━\n';
+        teks += 'Terima kasih telah berbelanja di PT. PELOPOR SAMI JAYA! 🙏';
+
+        // ── Buka WhatsApp dengan teks ──
+        const encoded = encodeURIComponent(teks);
+        const waUrl = waPhoneNumber
+            ? `https://wa.me/${waPhoneNumber}?text=${encoded}`
+            : `https://wa.me/?text=${encoded}`;
+
+        window.open(waUrl, '_blank');
+
+        // Feedback tombol
+        text.innerHTML = '✅ WhatsApp dibuka!';
         btn.disabled = true;
-        text.textContent = '📤 Membuka WhatsApp...';
-
-        try {
-            const file = new File([renderedBlob], receiptFileName, { type: 'image/png' });
-
-            // Web Share API (HP Android/iOS Chrome/Safari)
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'Struk Pembelian Ikan',
-                    text: 'Berikut struk pembelian Anda. Terima kasih! 🐟',
-                });
-
-                text.innerHTML = `✅ Terkirim! <small style="font-weight:600; opacity:.85">(Tap untuk kirim lagi)</small>`;
-                btn.disabled = false;
-                return;
-            }
-        } catch(err) {
-            // User cancel share sheet → reset
-            if (err.name === 'AbortError') {
-                btn.disabled = false;
-                if (phoneLabel) {
-                    text.innerHTML = `<span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE ${phoneLabel} &nbsp;<i class="fab fa-whatsapp"></i>`;
-                } else {
-                    text.textContent = 'KIRIM STRUK KE WHATSAPP';
-                }
-                return;
-            }
-        }
-
-        // Fallback Desktop: unduh gambar + buka WhatsApp
-        const url = URL.createObjectURL(renderedBlob);
-        const a   = document.createElement('a');
-        a.href = url;
-        a.download = receiptFileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
         setTimeout(() => {
-            const waUrl = waPhoneNumber
-                ? `https://wa.me/${waPhoneNumber}`
-                : `https://wa.me/`;
-            window.open(waUrl, '_blank');
-        }, 700);
-
-        text.innerHTML = '✅ Gambar tersimpan — WhatsApp dibuka!';
-        btn.disabled = false;
-    }
-
-    // Fallback render on demand (jika auto-render gagal)
-    async function buatGambarDanKirimWA() {
-        const btn  = document.getElementById('btnBuatGambar');
-        const text = document.getElementById('btnShareText');
-        btn.disabled = true;
-        text.textContent = '⏳ Membuat gambar...';
-
-        try {
-            const receiptEl = document.getElementById('receiptCard');
-            const canvas = await html2canvas(receiptEl, {
-                scale: 2, useCORS: true, allowTaint: false,
-                backgroundColor: '#ffffff', logging: false, removeContainer: true
-            });
-            canvas.toBlob(blob => {
-                renderedBlob = blob;
-                btn.disabled = false;
-                kirimStrukWA();
-            }, 'image/png', 1.0);
-        } catch(err) {
             btn.disabled = false;
-            text.textContent = '⚠️ Gagal — coba lagi.';
-        }
+            if (phoneLabel) {
+                text.innerHTML = `<span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE ${phoneLabel}&nbsp;<i class="fab fa-whatsapp"></i>`;
+            } else {
+                text.innerHTML = `<span class="ready-pulse"></span>&nbsp;KIRIM STRUK KE WHATSAPP`;
+            }
+        }, 3000);
     }
 </script>
 @endpush

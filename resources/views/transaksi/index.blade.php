@@ -8,6 +8,7 @@
     .page-shell {
         max-width: 1180px;
         margin: 0 auto;
+        padding-bottom: 24px;
     }
 
     .toolbar {
@@ -44,7 +45,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 10px;
-        background: rgba(255,255,255,0.92);
+        background: rgba(255,255,255,0.96);
         border: 1px solid rgba(15,23,36,0.06);
         border-radius: 16px;
         box-shadow: 0 8px 20px rgba(11,35,60,0.04);
@@ -80,8 +81,11 @@
         font-weight: 800;
         min-height: 48px;
         cursor: pointer;
+        transition: background 0.15s;
     }
-        cursor: pointer;
+
+    .search-form button:hover {
+        background: #1e293b;
     }
 
     .reset-link {
@@ -90,6 +94,18 @@
         text-decoration: none;
         font-size: 13px;
         padding: 0 4px;
+    }
+
+    /* ─── DATA CONTAINER & TRANSITION ─── */
+    #transaksi-data-container {
+        position: relative;
+        transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    #transaksi-data-container.is-loading {
+        opacity: 0.45;
+        filter: blur(1px);
+        pointer-events: none;
     }
 
     .table-card {
@@ -148,7 +164,7 @@
 
     .ikan-info {
         font-weight: 700;
-        color: var(--blue);
+        color: #1F2937;
     }
 
     .total-harga {
@@ -171,18 +187,21 @@
     }
 
     .status-lunas {
-        background: var(--green-light);
-        color: var(--green);
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
     }
 
     .status-dp {
-        background: #fff4d6;
-        color: #c77c00;
+        background: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fde68a;
     }
 
     .status-belum {
-        background: var(--red-light);
-        color: var(--red);
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
     }
 
     .sisa-bayar {
@@ -222,17 +241,91 @@
         font-weight: 600;
     }
 
+    /* ─── TOMBOL SALIN NO TELEPON (CLIPBOARD) ─── */
+    .btn-copy-phone {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #2563eb;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 7px;
+        padding: 3px 8px;
+        margin-top: 3px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s ease;
+        text-decoration: none;
+    }
+
+    .btn-copy-phone:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .btn-copy-phone:active {
+        transform: scale(0.95);
+    }
+
+    .btn-copy-phone.copied {
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+        border-color: #a7f3d0 !important;
+    }
+
+    .btn-copy-phone i {
+        font-size: 11px;
+    }
+
+    /* ─── TOAST NOTIFICATION ─── */
+    .copy-toast-notification {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(40px);
+        background: #0f172a;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 99999;
+        pointer-events: none;
+    }
+
+    .copy-toast-notification.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .copy-toast-notification i {
+        color: #10b981;
+    }
+
+    /* ─── MOBILE CARDS ─── */
     .mobile-list {
         display: none;
     }
 
     .mobile-card {
-        background: rgba(255,255,255,0.96);
-        border: 1px solid rgba(15,23,36,0.06);
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
         border-radius: 18px;
-        box-shadow: 0 10px 24px rgba(11,35,60,0.04);
-        padding: 14px;
-        margin-bottom: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 16px;
+        margin-bottom: 14px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .mobile-head {
@@ -240,30 +333,77 @@
         align-items: flex-start;
         justify-content: space-between;
         gap: 10px;
-        margin-bottom: 10px;
     }
 
     .mobile-name {
-        font-weight: 800;
-        font-size: 15px;
-        color: var(--text);
+        font-weight: 700;
+        font-size: 16px;
+        color: #111827;
+        text-transform: capitalize;
+        line-height: 1.25;
+    }
+
+    .mobile-date {
+        font-size: 12px;
+        color: #6B7280;
+        margin-top: 3px;
     }
 
     .mobile-total {
         font-weight: 800;
-        color: var(--blue);
-        font-size: 14px;
+        color: #111827;
+        font-size: 16px;
         white-space: nowrap;
+        text-align: right;
     }
 
-    .mobile-meta {
+    .mobile-weight {
+        font-size: 12px;
+        color: #6B7280;
+        margin-top: 3px;
+        text-align: right;
+    }
+
+    .mobile-items {
+        margin: 12px 0;
+        padding: 10px 0;
+        border-top: 1px solid #f3f4f6;
+        border-bottom: 1px solid #f3f4f6;
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mobile-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+    }
+
+    .mobile-item-name {
+        color: #1F2937;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .mobile-item-weight {
+        color: #6B7280;
+        font-family: monospace;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .mobile-footer {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
         gap: 8px;
-        color: var(--text-muted);
-        font-size: 12px;
-        margin-bottom: 10px;
+        padding-top: 2px;
     }
 
     .mobile-actions {
@@ -277,17 +417,35 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 38px;
-        height: 38px;
+        width: 36px;
+        height: 36px;
         border-radius: 10px;
         border: none;
         cursor: pointer;
-        color: white;
         text-decoration: none;
+        transition: transform 0.1s, opacity 0.15s;
     }
 
-    .mobile-btn.edit { background: #ffb300; }
-    .mobile-btn.delete { background: var(--red); }
+    .mobile-btn:active {
+        transform: scale(0.94);
+    }
+
+    .mobile-btn.receipt {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+
+    .mobile-btn.edit {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+    }
+
+    .mobile-btn.delete {
+        background: #ef4444;
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+    }
 
     .empty-state {
         display: flex;
@@ -308,6 +466,85 @@
     .empty-state i {
         font-size: 38px;
         opacity: 0.35;
+    }
+
+    /* ─── FLUENT MINIMALIST PAGINATION ─── */
+    .fluent-pagination-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        margin-bottom: 6px;
+    }
+
+    .fluent-pagination {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #ffffff;
+        padding: 5px 8px;
+        border-radius: 14px;
+        border: 1.5px solid #eef2f6;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    }
+
+    .fluent-page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border-radius: 10px;
+        border: 1.5px solid transparent;
+        background: transparent;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        user-select: none;
+        box-sizing: border-box;
+    }
+
+    .fluent-page-btn:hover:not(.disabled):not(.active) {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #e2e8f0;
+    }
+
+    .fluent-page-btn.active {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+    }
+
+    .fluent-page-btn.disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        pointer-events: none;
+        color: #94a3b8;
+    }
+
+    .fluent-page-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 36px;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .fluent-page-info {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #64748b;
+        text-align: center;
     }
 
     @media (max-width: 640px) {
@@ -335,6 +572,16 @@
         .mobile-list {
             display: block;
         }
+        .fluent-pagination {
+            gap: 4px;
+            padding: 4px 6px;
+        }
+        .fluent-page-btn {
+            min-width: 32px;
+            height: 32px;
+            font-size: 12px;
+            padding: 0 8px;
+        }
     }
 </style>
 @endpush
@@ -354,161 +601,402 @@
             <span>Buat Transaksi Baru</span>
         </a>
 
-        <form class="search-form" method="GET" action="{{ route('transaksi.index') }}">
-            <input type="text" name="search" placeholder="Cari nama atau no HP..." value="{{ $search ?? '' }}">
-            <select name="status">
+        <form class="search-form" id="searchFilterForm" method="GET" action="{{ route('transaksi.index') }}">
+            <input type="text" name="search" id="searchInput" placeholder="Cari nama atau no HP..." value="{{ $search ?? '' }}">
+            <select name="status" id="statusSelect">
                 <option value="">Semua Status</option>
                 <option value="lunas" {{ ($status ?? '') == 'lunas' ? 'selected' : '' }}>Lunas</option>
-                <option value="belum_lunas" {{ ($status ?? '') == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                <option value="belum_lunas" {{ ($status ?? '') == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas (termasuk DP)</option>
             </select>
             <button type="submit">CARI</button>
             @if($search || $status)
-                <a href="{{ route('transaksi.index') }}" class="reset-link">Reset</a>
+                <a href="{{ route('transaksi.index') }}" class="reset-link" id="resetFilterBtn">Reset</a>
             @endif
         </form>
     </div>
 
-    <div class="table-card desktop-table">
-        <div class="table-wrapper">
-            <table class="tabel-sederhana">
-                <thead>
-                    <tr>
-                        <th>Pembeli & Waktu</th>
-                        <th>Pesanan Ikan</th>
-                        <th>Total Harga</th>
-                        <th>Status Bayar</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($transaksi as $t)
-                    <tr>
-                        <td>
-                            <div class="nama-pembeli">{{ $t->pembeli_nama }}</div>
-                            @if($t->telepon)
-                                <div style="font-size: 12px; color: #0284c7; font-weight: 600; margin-top: 2px;">
-                                    <i class="fas fa-phone-alt" style="font-size: 10px;"></i> {{ $t->telepon }}
+    <!-- ─── WRAPPER DATA TRANSAKSI UNTUK AJAX ─── -->
+    <div id="transaksi-data-container">
+        <!-- Tampilan Desktop: Tabel -->
+        <div class="table-card desktop-table">
+            <div class="table-wrapper">
+                <table class="tabel-sederhana">
+                    <thead>
+                        <tr>
+                            <th>Pembeli</th>
+                            <th>Ikan</th>
+                            <th>Total (Rp)</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($transaksi as $t)
+                        @php
+                            $telepon = $t->telepon ?: ($t->pelanggan->telepon ?? null);
+                        @endphp
+                        <tr>
+                            <td>
+                                <div class="nama-pembeli">{{ $t->pembeli_nama }}</div>
+                                @if($telepon)
+                                    <div>
+                                        <button type="button" class="btn-copy-phone" onclick="copyToClipboard('{{ $telepon }}', this)" title="Klik untuk salin no telepon">
+                                            <i class="fas fa-copy"></i>
+                                            <span>{{ $telepon }}</span>
+                                        </button>
+                                    </div>
+                                @endif
+                                <div class="tgl-transaksi"><i class="fas fa-calendar-alt"></i> {{ $t->tanggal_transaksi->format('d M Y - H:i') }}</div>
+                            </td>
+                            <td>
+                                @if($t->details && $t->details->count() > 0)
+                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                        @foreach($t->details as $d)
+                                            <div>
+                                                <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?? '-') }}</span>
+                                                <span style="font-size: 13px; color: var(--text-muted);">({{ $d->jumlah_kg }} Kg)</span>
+                                            </div>
+                                        @endforeach
+                                        @if($t->details->count() > 1)
+                                            <div style="font-size: 11px; font-weight: 700; color: #166534; margin-top: 2px;">
+                                                Total: {{ $t->jumlah_kg }} Kg
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</div>
+                                    <div>{{ $t->jumlah_kg }} Kg</div>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="total-harga">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
+                            </td>
+                            <td>
+                                @if($t->status == 'lunas')
+                                    <div class="status-lunas"><i class="fas fa-check"></i> LUNAS</div>
+                                @elseif($t->status == 'dp')
+                                    <div class="status-dp"><i class="fas fa-clock"></i> DP</div>
+                                    <div class="sisa-bayar">Sisa: Rp {{ number_format($t->total - $t->jumlah_dibayar, 0, ',', '.') }}</div>
+                                @else
+                                    <div class="status-belum"><i class="fas fa-times"></i> BELUM</div>
+                                    <div class="sisa-bayar">Tunggakan: Rp {{ number_format($t->total, 0, ',', '.') }}</div>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('transaksi.show', $t->id) }}" class="btn-aksi" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
+                                <a href="{{ route('transaksi.edit', $t->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
+                                <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-aksi btn-hapus" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-box-open"></i>
+                                    <div>Belum ada data transaksi.</div>
                                 </div>
-                            @endif
-                            <div class="tgl-transaksi"><i class="fas fa-calendar-alt"></i> {{ $t->tanggal_transaksi->format('d M Y - H:i') }}</div>
-                        </td>
-                        <td>
-                            @if($t->details && $t->details->count() > 0)
-                                <div style="display: flex; flex-direction: column; gap: 4px;">
-                                    @foreach($t->details as $d)
-                                        <div>
-                                            <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span>
-                                            <span style="font-size: 13px; color: var(--text-muted);">({{ $d->jumlah_kg }} Kg)</span>
-                                        </div>
-                                    @endforeach
-                                    @if($t->details->count() > 1)
-                                        <div style="font-size: 11px; font-weight: 700; color: #166534; margin-top: 2px;">
-                                            Total: {{ $t->jumlah_kg }} Kg
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                <div class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</div>
-                                <div>{{ $t->jumlah_kg }} Kg</div>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="total-harga">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
-                        </td>
-                        <td>
-                            @if($t->status == 'lunas')
-                                <div class="status-lunas"><i class="fas fa-check"></i> LUNAS</div>
-                            @elseif($t->status == 'dp')
-                                <div class="status-dp"><i class="fas fa-hand-holding-usd"></i> DP</div>
-                                <div class="sisa-bayar">Sisa: Rp {{ number_format($t->total - $t->jumlah_dibayar, 0, ',', '.') }}</div>
-                            @else
-                                <div class="status-belum"><i class="fas fa-times"></i> BELUM</div>
-                                <div class="sisa-bayar">Tunggakan: Rp {{ number_format($t->total, 0, ',', '.') }}</div>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="{{ route('transaksi.show', $t->id) }}" class="btn-aksi" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
-                            <a href="{{ route('transaksi.edit', $t->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
-                            <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-aksi btn-hapus" title="Hapus"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5">
-                            <div class="empty-state">
-                                <i class="fas fa-box-open"></i>
-                                <div>Belum ada data transaksi.</div>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div class="mobile-list">
-        @forelse($transaksi as $t)
-        <div class="mobile-card">
-            <div class="mobile-head">
-                <div>
-                    <div class="mobile-name">{{ $t->pembeli_nama }}</div>
-                    @if($t->telepon)
-                        <div style="font-size: 12px; color: #0284c7; font-weight: 600; margin-top: 2px;">
-                            <i class="fas fa-phone-alt" style="font-size: 10px;"></i> {{ $t->telepon }}
+        <!-- Tampilan Mobile: Card Rapi & Bersih -->
+        <div class="mobile-list">
+            @forelse($transaksi as $t)
+            @php
+                $telepon = $t->telepon ?: ($t->pelanggan->telepon ?? null);
+            @endphp
+            <div class="mobile-card">
+                <!-- Bagian Atas: Kiri (Nama, Salin Telp, Tanggal), Kanan (Harga, Total Berat) -->
+                <div class="mobile-head">
+                    <div>
+                        <div class="mobile-name">{{ $t->pembeli_nama ?: ($t->pelanggan->nama ?? 'Pelanggan') }}</div>
+                        @if($telepon)
+                            <div>
+                                <button type="button" class="btn-copy-phone" onclick="copyToClipboard('{{ $telepon }}', this)" title="Klik untuk salin no telepon">
+                                    <i class="fas fa-copy"></i>
+                                    <span>{{ $telepon }}</span>
+                                </button>
+                            </div>
+                        @endif
+                        <div class="mobile-date">
+                            {{ $t->tanggal_transaksi->format('d M Y') }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="mobile-total">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
+                        <div class="mobile-weight">
+                            Total: <strong>{{ number_format($t->jumlah_kg, 2) }} Kg</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bagian Tengah: Daftar Ikan (Nama di Kiri - Gelap, Berat di Kanan - Abu-abu sejajar) -->
+                <div class="mobile-items">
+                    @if($t->details && $t->details->count() > 0)
+                        @foreach($t->details as $d)
+                            <div class="mobile-item-row">
+                                <div class="mobile-item-name">
+                                    <span style="color: #94a3b8; font-size: 14px;">•</span>
+                                    <span>{{ $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?? '-') }}</span>
+                                </div>
+                                <div class="mobile-item-weight">
+                                    {{ number_format($d->jumlah_kg, 2) }} Kg
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="mobile-item-row">
+                            <div class="mobile-item-name">
+                                <span style="color: #94a3b8; font-size: 14px;">•</span>
+                                <span>{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
+                            </div>
+                            <div class="mobile-item-weight">
+                                {{ number_format($t->jumlah_kg, 2) }} Kg
+                            </div>
                         </div>
                     @endif
                 </div>
-                <div class="mobile-total">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
-            </div>
-            <div class="mobile-meta">
-                <span>{{ $t->tanggal_transaksi->format('d M Y') }}</span>
-                <span>Total: {{ $t->jumlah_kg }} Kg</span>
-            </div>
-            <div class="mobile-meta" style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;">
-                @if($t->details && $t->details->count() > 0)
-                    <div style="font-size: 13px;">
-                        @foreach($t->details as $d)
-                            <div>&bull; <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span> ({{ $d->jumlah_kg }} Kg)</div>
-                        @endforeach
+
+                <!-- Bagian Bawah: Status di Kiri & 3 Tombol Aksi di Kanan -->
+                <div class="mobile-footer">
+                    <div>
+                        @if($t->status == 'lunas')
+                            <span class="status-lunas"><i class="fas fa-check"></i> LUNAS</span>
+                        @elseif($t->status == 'dp')
+                            <span class="status-dp"><i class="fas fa-clock"></i> DP</span>
+                        @else
+                            <span class="status-belum"><i class="fas fa-times"></i> BELUM</span>
+                        @endif
                     </div>
-                @else
-                    <span class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
-                @endif
-                <div style="margin-top: 6px;">
-                    @if($t->status == 'lunas')
-                        <span class="status-lunas"><i class="fas fa-check"></i> LUNAS</span>
-                    @elseif($t->status == 'dp')
-                        <span class="status-dp"><i class="fas fa-hand-holding-usd"></i> DP</span>
-                    @else
-                        <span class="status-belum"><i class="fas fa-times"></i> BELUM</span>
-                    @endif
+                    <div class="mobile-actions">
+                        <a href="{{ route('transaksi.show', $t->id) }}" class="mobile-btn receipt" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
+                        <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
+                        <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');" style="margin: 0;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="mobile-btn delete" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div class="mobile-actions">
-                <a href="{{ route('transaksi.show', $t->id) }}" class="mobile-btn" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
-                <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="mobile-btn delete" title="Hapus"><i class="fas fa-trash"></i></button>
-                </form>
+            @empty
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <div>Belum ada data transaksi.</div>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- ─── PAGINATION FLUENT MINIMALIST (POSISI TENGAH) ─── -->
+        @if ($transaksi->hasPages())
+        <div class="fluent-pagination-container">
+            <nav class="fluent-pagination" role="navigation" aria-label="Navigasi Halaman">
+                {{-- Tombol Sebelumnya --}}
+                @if ($transaksi->onFirstPage())
+                    <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Sebelumnya">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                @else
+                    <a href="{{ $transaksi->previousPageUrl() }}" class="fluent-page-btn" rel="prev" title="Halaman Sebelumnya">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                @endif
+
+                {{-- Nomor Halaman --}}
+                @php
+                    $start = max(1, $transaksi->currentPage() - 2);
+                    $end = min($transaksi->lastPage(), $transaksi->currentPage() + 2);
+                @endphp
+
+                @if($start > 1)
+                    <a href="{{ $transaksi->url(1) }}" class="fluent-page-btn">1</a>
+                    @if($start > 2)
+                        <span class="fluent-page-dots">...</span>
+                    @endif
+                @endif
+
+                @for ($page = $start; $page <= $end; $page++)
+                    @if ($page == $transaksi->currentPage())
+                        <span class="fluent-page-btn active" aria-current="page">{{ $page }}</span>
+                    @else
+                        <a href="{{ $transaksi->url($page) }}" class="fluent-page-btn">{{ $page }}</a>
+                    @endif
+                @endfor
+
+                @if($end < $transaksi->lastPage())
+                    @if($end < $transaksi->lastPage() - 1)
+                        <span class="fluent-page-dots">...</span>
+                    @endif
+                    <a href="{{ $transaksi->url($transaksi->lastPage()) }}" class="fluent-page-btn">{{ $transaksi->lastPage() }}</a>
+                @endif
+
+                {{-- Tombol Selanjutnya --}}
+                @if ($transaksi->hasMorePages())
+                    <a href="{{ $transaksi->nextPageUrl() }}" class="fluent-page-btn" rel="next" title="Halaman Selanjutnya">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                @else
+                    <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Selanjutnya">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                @endif
+            </nav>
+            <div class="fluent-page-info">
+                Menampilkan {{ $transaksi->firstItem() ?? 0 }} - {{ $transaksi->lastItem() ?? 0 }} dari {{ $transaksi->total() }} transaksi
             </div>
         </div>
-        @empty
-        <div class="empty-state">
-            <i class="fas fa-box-open"></i>
-            <div>Belum ada data transaksi.</div>
-        </div>
-        @endforelse
-    </div>
-
-    <div style="margin-top: 20px;">
-        {{ $transaksi->links('pagination::bootstrap-4') }}
+        @endif
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // ─── FUNGSI SALIN NO TELEPON KE CLIPBOARD & FEEDBACK ───
+    function copyToClipboard(text, element) {
+        if (!text) return;
+
+        const doSuccessFeedback = () => {
+            if (element) {
+                const originalHTML = element.innerHTML;
+                element.classList.add('copied');
+                element.innerHTML = `<i class="fas fa-check"></i> <span>Tersalin!</span>`;
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.classList.remove('copied');
+                }, 1800);
+            }
+            showToast('Nomor ' + text + ' berhasil disalin!');
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text)
+                .then(doSuccessFeedback)
+                .catch(() => fallbackCopy(text, doSuccessFeedback));
+        } else {
+            fallbackCopy(text, doSuccessFeedback);
+        }
+    }
+
+    function fallbackCopy(text, callback) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            if (callback) callback();
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showToast(message) {
+        let toast = document.getElementById('copy-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'copy-toast';
+            toast.className = 'copy-toast-notification';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> <span>${message}</span>`;
+        toast.classList.add('show');
+        clearTimeout(window.copyToastTimeout);
+        window.copyToastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // ─── AJAX PAGINATION & FILTER TANPA REFRESH HALAMAN ───
+    async function loadTransaksiData(url, updateHistory = true) {
+        const container = document.getElementById('transaksi-data-container');
+        if (!container) return;
+
+        // Beri efek loading halus
+        container.classList.add('is-loading');
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) throw new Error('Gagal mengambil data transaksi');
+
+            const htmlText = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const newContent = doc.getElementById('transaksi-data-container');
+
+            if (newContent) {
+                container.innerHTML = newContent.innerHTML;
+            }
+
+            // Update browser URL tanpa refresh
+            if (updateHistory) {
+                history.pushState(null, '', url);
+            }
+
+            // Scroll halus ke atas tabel
+            const toolbar = document.querySelector('.toolbar');
+            if (toolbar) {
+                toolbar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (error) {
+            console.error('AJAX Error:', error);
+            // Fallback reload jika terjadi masalah
+            window.location.href = url;
+        } finally {
+            container.classList.remove('is-loading');
+        }
+    }
+
+    // Tangkap klik tombol pagination
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('.fluent-page-btn[href]');
+        if (link) {
+            e.preventDefault();
+            loadTransaksiData(link.href);
+        }
+
+        const resetLink = e.target.closest('#resetFilterBtn');
+        if (resetLink) {
+            e.preventDefault();
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusSelect').value = '';
+            loadTransaksiData(resetLink.href);
+        }
+    });
+
+    // Tangkap submit form pencarian / filter
+    const searchForm = document.getElementById('searchFilterForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(searchForm);
+            const params = new URLSearchParams(formData);
+            const actionUrl = searchForm.action + '?' + params.toString();
+            loadTransaksiData(actionUrl);
+        });
+    }
+
+    // Support tombol Back/Forward browser
+    window.addEventListener('popstate', function () {
+        loadTransaksiData(window.location.href, false);
+    });
+</script>
+@endpush

@@ -38,12 +38,15 @@ class LaporanController extends Controller
             }
         }
 
-        $transaksi = $query->get();
+        $allTransaksi = (clone $query)->get();
             
-        $totalPendapatan = $transaksi->where('status', 'lunas')->sum('total');
-        $totalPiutang    = $transaksi->where('status', 'belum_lunas')->sum('total');
-        $totalKg         = $transaksi->sum('jumlah_kg');
-        $totalTransaksi  = $transaksi->count();
+        $totalPendapatan = $allTransaksi->where('status', 'lunas')->sum('total');
+        $totalPiutang    = $allTransaksi->where('status', 'belum_lunas')->sum('total');
+        $totalKg         = $allTransaksi->sum('jumlah_kg');
+        $totalTransaksi  = $allTransaksi->count();
+
+        // Data transaksi per halaman (10 per halaman)
+        $transaksi = $query->paginate(10)->withQueryString();
 
         // Data chart pendapatan harian dalam bulan laporan
         $chartLabels = [];
@@ -56,7 +59,7 @@ class LaporanController extends Controller
             }
             $tglStr = $tgl->format('Y-m-d');
             $chartLabels[] = $tgl->format('d/m');
-            $val = $transaksi->filter(function($item) use ($tglStr) {
+            $val = $allTransaksi->filter(function($item) use ($tglStr) {
                 return $item->tanggal_transaksi->format('Y-m-d') === $tglStr;
             })->sum('total');
             $chartValues[] = (float) $val;

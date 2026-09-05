@@ -30,9 +30,12 @@
         border: 1px solid rgba(11,35,60,0.04);
     }
     .form-card-header {
-        padding: 28px 32px 24px;
-        background: linear-gradient(135deg, #1e88e5, #42a5f5);
-        color: #fff;
+        padding: 24px 28px;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
     .form-card-header h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
     .form-card-header p  { font-size: 13px; opacity: 0.85; }

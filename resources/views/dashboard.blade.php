@@ -5,338 +5,343 @@
 
 @push('styles')
 <style>
-    .content-inner {
-        max-width: 1180px;
+    .dashboard-container {
+        max-width: 980px;
         margin: 0 auto;
-        padding-bottom: 12px;
+        padding-bottom: 24px;
     }
 
-    /* ─── WELCOME BANNER SIMPLE ─── */
-    .welcome-strip {
-        margin-bottom: 16px;
-        padding: 16px 18px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,247,255,0.95));
-        border: 1px solid rgba(30,136,229,0.08);
-        box-shadow: 0 8px 24px rgba(15, 23, 36, 0.04);
-    }
-
-    .welcome-top {
+    /* ─── KARTU SAMBUTAN (RINGKAS & BERSIH) ─── */
+    .welcome-card {
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        padding: 14px 18px;
+        margin-bottom: 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .welcome-text-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
     }
 
     .welcome-title {
-        font-size: clamp(18px, 2vw, 24px);
+        font-size: 18px;
         font-weight: 800;
-        letter-spacing: -0.03em;
-        color: var(--text);
+        color: #0f172a;
+        letter-spacing: -0.02em;
         line-height: 1.2;
     }
 
     .welcome-sub {
-        font-size: 13px;
-        color: var(--text-muted);
-        margin-top: 4px;
+        font-size: 12.5px;
+        color: #64748b;
+        font-weight: 500;
     }
 
-    /* Tombol Toggle Detail Kecil di Mobile */
-    .btn-toggle-meta {
-        background: #f1f5f9;
-        color: #475569;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        padding: 4px 8px;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.15s;
-    }
-
-    .btn-toggle-meta:hover {
-        background: #e2e8f0;
-    }
-
-    .welcome-meta {
+    .welcome-pills {
         display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px dashed rgba(148,163,184,0.25);
-    }
-
-    .welcome-meta .meta-pill {
-        display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 5px 10px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.8);
-        border: 1px solid rgba(148,163,184,0.2);
-        font-size: 11px;
-        font-weight: 600;
+        flex-wrap: wrap;
     }
 
-    /* ─── STAT CARDS GRID 2x2 PADA MOBILE ─── */
-    .stat-grid {
+    .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        font-size: 11px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .meta-pill i {
+        color: #2563eb;
+        font-size: 10px;
+    }
+
+    @media (max-width: 640px) {
+        .welcome-card {
+            padding: 12px 14px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+    }
+
+    /* ─── GRID 2x2 STATISTIK (PADAT & SIMETRIS) ─── */
+    .stat-grid-2x2 {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-        margin-bottom: 20px;
-        align-items: stretch;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
     }
 
     .stat-card {
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        padding: 12px 14px;
         position: relative;
-        padding: 16px;
-        border-radius: 16px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.985), rgba(250,252,255,0.96));
-        border: 1px solid rgba(15, 23, 36, 0.05);
-        box-shadow: 0 6px 20px rgba(11,35,60,0.05);
         overflow: hidden;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        min-height: 82px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
     }
 
     .stat-card::before {
         content: '';
         position: absolute;
-        inset: 0 auto 0 0;
-        width: 4px;
-        border-radius: 12px 0 0 12px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 3.5px;
+        border-radius: 4px 0 0 4px;
     }
 
-    .stat-card.blue::before  { background: var(--blue); }
-    .stat-card.red::before   { background: var(--red); }
-    .stat-card.green::before { background: var(--green); }
-    .stat-card.teal::before  { background: #00897b; }
+    .stat-card.blue::before  { background: #2563eb; }
+    .stat-card.red::before   { background: #e11d48; }
+    .stat-card.green::before { background: #059669; }
+    .stat-card.teal::before  { background: #0d9488; }
 
-    .stat-icon-wrap {
-        width: 42px;
-        height: 42px;
+    .stat-header {
         display: flex;
         align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        margin-bottom: 12px;
-        font-size: 18px;
+        justify-content: space-between;
+        margin-bottom: 4px;
     }
-
-    .stat-icon-wrap.blue  { background: var(--blue-light); color: var(--blue); }
-    .stat-icon-wrap.red   { background: var(--red-light); color: var(--red); }
-    .stat-icon-wrap.green { background: var(--green-light); color: var(--green); }
-    .stat-icon-wrap.teal  { background: rgba(0,137,123,0.08); color: #00897b; }
 
     .stat-label {
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-        line-height: 1.3;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        line-height: 1.2;
     }
+
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.blue  { background: #eff6ff; color: #2563eb; }
+    .stat-icon.red   { background: #fff1f2; color: #e11d48; }
+    .stat-icon.green { background: #ecfdf5; color: #059669; }
+    .stat-icon.teal  { background: #f0fdfa; color: #0d9488; }
 
     .stat-value {
-        font-size: clamp(20px, 1.8vw, 28px);
+        font-size: clamp(16px, 1.5vw, 22px);
         font-weight: 800;
-        letter-spacing: -0.04em;
-        color: var(--text);
-        line-height: 1.1;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
     }
 
-    .stat-value.blue  { color: var(--blue); }
-    .stat-value.red   { color: var(--red); }
-    .stat-value.green { color: var(--green); }
-    .stat-value.teal  { color: #00897b; }
+    .stat-value.blue  { color: #2563eb; }
+    .stat-value.red   { color: #e11d48; }
+    .stat-value.green { color: #059669; }
+    .stat-value.teal  { color: #0d9488; }
 
-    /* Quick Shortcut Box */
-    .quick-actions-bar {
-        display: flex;
+    @media (max-width: 480px) {
+        .stat-card {
+            padding: 10px 12px;
+            min-height: 76px;
+        }
+        .stat-label {
+            font-size: 10px;
+        }
+        .stat-value {
+            font-size: 15px;
+        }
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 11px;
+        }
+    }
+
+    /* ─── 3 TOMBOL PINTASAN (SEIMBANG & RAPI) ─── */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
+        margin-bottom: 14px;
     }
 
     .quick-btn {
-        flex: 1;
-        min-width: 140px;
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid #eef2f6;
+        border-radius: 14px;
         padding: 12px 14px;
         display: flex;
         align-items: center;
         gap: 10px;
         text-decoration: none;
-        color: var(--text);
+        color: #0f172a;
         font-weight: 700;
         font-size: 13px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        transition: all 0.15s;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+        transition: all 0.15s ease;
+        box-sizing: border-box;
     }
 
     .quick-btn:hover {
-        border-color: var(--blue);
+        border-color: #2563eb;
         transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.1);
+        color: #2563eb;
     }
 
-    .quick-btn i {
-        font-size: 16px;
-        color: var(--blue);
+    .quick-btn:active {
+        transform: scale(0.98);
     }
 
-    /* ─── RESPONSIVE 2X2 MOBILE VIEW ─── */
-    @media (max-width: 768px) {
-        .stat-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 10px;
-        }
+    .quick-btn-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
 
-        .stat-card {
-            padding: 12px;
-            min-height: auto;
-        }
+    .quick-btn-icon.blue   { background: #eff6ff; color: #2563eb; }
+    .quick-btn-icon.sky    { background: #e0f2fe; color: #0284c7; }
+    .quick-btn-icon.green  { background: #ecfdf5; color: #059669; }
 
-        .stat-icon-wrap {
-            width: 36px;
-            height: 36px;
-            font-size: 15px;
-            margin-bottom: 8px;
+    @media (max-width: 640px) {
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
-
-        .stat-label {
-            font-size: 10px;
-        }
-
-        .stat-value {
-            font-size: 18px;
-        }
-
-        /* Detail item disembunyikan secara default di mobile view */
-        .welcome-meta {
-            display: none;
-        }
-        
-        .welcome-meta.show-mobile {
-            display: flex;
+        .quick-btn {
+            padding: 11px 14px;
         }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="content-inner">
-    <!-- Salam & Info User -->
-    <div class="welcome-strip">
-        <div class="welcome-top">
-            <div>
-                <div class="welcome-title">Selamat datang, {{ explode(' ', Auth::user()->name)[0] }}! 👋</div>
-                <div class="welcome-sub">Ringkasan aktivitas transaksi hari ini.</div>
-            </div>
-            
-            <!-- Tombol Kecil Toggle Info di Mobile -->
-            <button type="button" class="btn-toggle-meta" onclick="toggleMetaInfo()">
-                <i class="fas fa-info-circle"></i>
-                <span id="btnMetaText">Info</span>
-            </button>
-        </div>
+<div class="dashboard-container">
 
-        <!-- Detail Meta (Tersembunyi di mobile kecuali tombol ditekan) -->
-        <div class="welcome-meta" id="welcomeMetaBox">
+    <!-- 1. KARTU SAMBUTAN (RINGKAS & RAPI) -->
+    <div class="welcome-card">
+        <div class="welcome-text-wrap">
+            <div class="welcome-title">Selamat datang, {{ explode(' ', Auth::user()->name)[0] }}! 👋</div>
+            <div class="welcome-sub">Ringkasan aktivitas transaksi hari ini.</div>
+        </div>
+        <div class="welcome-pills">
             <span class="meta-pill">
-                <i class="fas fa-user" style="font-size:10px;"></i>
-                {{ Auth::user()->role === 'admin' ? 'Admin' : 'Kepala Cabang' }}
+                <i class="fas fa-user-shield"></i>
+                <span>{{ Auth::user()->role === 'admin' ? 'Admin' : 'Kepala Cabang' }}</span>
             </span>
             <span class="meta-pill">
-                <i class="fas fa-building" style="font-size:10px;"></i>
-                {{ Auth::user()->role === 'admin' ? 'Pusat (Semua Cabang)' : (Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? 'Cabang')) }}
+                <i class="fas fa-store"></i>
+                <span>{{ Auth::user()->role === 'admin' ? 'Pusat (Semua Cabang)' : (Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? 'Cabang')) }}</span>
             </span>
             <span class="meta-pill">
-                <i class="fas fa-clock" style="font-size:10px;"></i>
-                {{ now()->isoFormat('D MMMM YYYY, HH:mm') }} WIB
+                <i class="fas fa-calendar-day"></i>
+                <span>{{ now()->isoFormat('D MMM YYYY') }}</span>
             </span>
         </div>
     </div>
 
-    <!-- 4 STAT CARDS (2x2 di Mobile View) -->
-    <div class="stat-grid">
+    <!-- 2. EMPAT KARTU STATISTIK (GRID 2x2 PADAT & SIMETRIS) -->
+    <div class="stat-grid-2x2">
+        <!-- Card 1: Transaksi Hari Ini -->
         <div class="stat-card blue">
-            <div class="stat-icon-wrap blue">
-                <i class="fas fa-shopping-cart"></i>
+            <div class="stat-header">
+                <span class="stat-label">Transaksi Hari Ini</span>
+                <div class="stat-icon blue">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
             </div>
-            <div>
-                <div class="stat-label">Transaksi Hari Ini</div>
-                <div class="stat-value blue">{{ $transaksiHariIni }}</div>
-            </div>
+            <div class="stat-value blue">{{ $transaksiHariIni }}</div>
         </div>
 
+        <!-- Card 2: Belum Lunas -->
         <div class="stat-card red">
-            <div class="stat-icon-wrap red">
-                <i class="fas fa-file-invoice"></i>
+            <div class="stat-header">
+                <span class="stat-label">Belum Lunas</span>
+                <div class="stat-icon red">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
             </div>
-            <div>
-                <div class="stat-label">Belum Lunas</div>
-                <div class="stat-value red">{{ $belumLunas }}</div>
-            </div>
+            <div class="stat-value red">{{ $belumLunas }}</div>
         </div>
 
+        <!-- Card 3: Omset Hari Ini -->
         <div class="stat-card green">
-            <div class="stat-icon-wrap green">
-                <i class="fas fa-coins"></i>
+            <div class="stat-header">
+                <span class="stat-label">Omset Hari Ini</span>
+                <div class="stat-icon green">
+                    <i class="fas fa-coins"></i>
+                </div>
             </div>
-            <div>
-                <div class="stat-label">Omset Hari Ini</div>
-                <div class="stat-value green">Rp {{ number_format($totalPenjualanHariIni, 0, ',', '.') }}</div>
-            </div>
+            <div class="stat-value green">Rp {{ number_format($totalPenjualanHariIni, 0, ',', '.') }}</div>
         </div>
 
+        <!-- Card 4: Omset Bulan Ini -->
         <div class="stat-card teal">
-            <div class="stat-icon-wrap teal">
-                <i class="fas fa-chart-line"></i>
+            <div class="stat-header">
+                <span class="stat-label">Omset Bulan Ini</span>
+                <div class="stat-icon teal">
+                    <i class="fas fa-chart-line"></i>
+                </div>
             </div>
-            <div>
-                <div class="stat-label">Omset Bulan Ini</div>
-                <div class="stat-value teal">Rp {{ number_format($penjualanBulanIni, 0, ',', '.') }}</div>
-            </div>
+            <div class="stat-value teal">Rp {{ number_format($penjualanBulanIni, 0, ',', '.') }}</div>
         </div>
     </div>
 
-    <!-- Shortcut Cepat -->
-    <div class="quick-actions-bar">
+    <!-- 3. TIGA TOMBOL PINTASAN (SEIMBANG & RAPI) -->
+    <div class="quick-actions-grid">
         <a href="{{ route('transaksi.create') }}" class="quick-btn">
-            <i class="fas fa-plus-circle" style="color: var(--blue);"></i>
+            <div class="quick-btn-icon blue">
+                <i class="fas fa-plus"></i>
+            </div>
             <span>Buat Transaksi Baru</span>
         </a>
         <a href="{{ route('transaksi.index') }}" class="quick-btn">
-            <i class="fas fa-receipt" style="color: #0284c7;"></i>
+            <div class="quick-btn-icon sky">
+                <i class="fas fa-receipt"></i>
+            </div>
             <span>Daftar Transaksi</span>
         </a>
         <a href="{{ route('laporan.index') }}" class="quick-btn">
-            <i class="fas fa-chart-bar" style="color: var(--green);"></i>
+            <div class="quick-btn-icon green">
+                <i class="fas fa-chart-bar"></i>
+            </div>
             <span>Lihat Laporan & Grafik</span>
         </a>
     </div>
+
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function toggleMetaInfo() {
-        const metaBox = document.getElementById('welcomeMetaBox');
-        const btnText = document.getElementById('btnMetaText');
-        const isShown = metaBox.classList.toggle('show-mobile');
-        btnText.textContent = isShown ? 'Tutup' : 'Info';
-    }
-</script>
-@endpush
