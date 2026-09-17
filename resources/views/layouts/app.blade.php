@@ -595,15 +595,15 @@
             <i class="fas fa-receipt"></i>
             Pesanan/Transaksi
         </a>
+        <a href="{{ route('ikan.index') }}" class="nav-item {{ request()->routeIs('ikan.*') ? 'active' : '' }}">
+            <i class="fas fa-fish"></i>
+            Daftar Ikan &amp; Stok
+        </a>
 
         @if(Auth::user()->role === 'admin')
         <a href="{{ route('pelanggan.index') }}" class="nav-item {{ request()->routeIs('pelanggan.*') ? 'active' : '' }}">
             <i class="fas fa-users"></i>
             Pelanggan
-        </a>
-        <a href="{{ route('ikan.index') }}" class="nav-item {{ request()->routeIs('ikan.*') ? 'active' : '' }}">
-            <i class="fas fa-fish"></i>
-            Data Ikan
         </a>
         <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
             <i class="fas fa-user-tie"></i>
@@ -676,11 +676,12 @@
         <i class="fas fa-users"></i>
         <span>Pelanggan</span>
     </a>
+    @endif
+
     <a href="{{ route('ikan.index') }}" class="b-nav-item {{ request()->routeIs('ikan.*') ? 'active' : '' }}">
         <i class="fas fa-fish"></i>
         <span>Ikan</span>
     </a>
-    @endif
 
     <a href="{{ route('laporan.index') }}" class="b-nav-item {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
         <i class="fas fa-chart-bar"></i>

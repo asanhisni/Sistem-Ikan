@@ -11,38 +11,83 @@
         padding-bottom: 30px;
     }
 
-    /* ─── FILTER PANEL ─── */
+    /* ─── TAB NAVIGASI LAPORAN (PENJUALAN VS STOK) ─── */
+    .laporan-nav-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        background: #eef2f6;
+        padding: 5px;
+        border-radius: 14px;
+        width: fit-content;
+    }
+
+    .laporan-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        color: #64748b;
+        transition: all 0.2s ease;
+    }
+
+    .laporan-tab-btn.active {
+        background: #ffffff;
+        color: #2563eb;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .laporan-tab-btn:hover:not(.active) {
+        color: #0f172a;
+    }
+
+    @media (max-width: 768px) {
+        .laporan-nav-tabs {
+            width: 100%;
+        }
+        .laporan-tab-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+    }
+
+    /* ─── FILTER PANEL (SAMA PERSIS DENGAN LAPORAN STOK IKAN) ─── */
     .filter-card {
         background: #ffffff;
-        border: 1px solid #eef2f6;
         border-radius: 16px;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-        padding: 12px 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
         margin-bottom: 16px;
     }
 
     .filter-form {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
 
     .filter-item {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        flex: 1;
-        min-width: 170px;
+        gap: 6px;
     }
 
     .filter-item label {
-        font-size: 12px;
-        font-weight: 700;
-        color: #475569;
         display: flex;
         align-items: center;
         gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
 
     .filter-item label i {
@@ -52,19 +97,18 @@
 
     .filter-select {
         width: 100%;
+        height: 40px;
+        padding: 6px 12px;
         border: 1.5px solid #e2e8f0;
-        background: #f8fafc;
         border-radius: 10px;
-        padding: 8px 12px;
-        font: inherit;
-        font-weight: 700;
-        font-size: 13.5px;
+        background: #f8fafc;
         color: #0f172a;
-        min-height: 40px;
+        font-size: 13px;
+        font-weight: 600;
         outline: none;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-sizing: border-box;
+        appearance: auto;
     }
 
     .filter-select:focus {
@@ -73,45 +117,30 @@
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    .btn-filter {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: #ffffff;
-        border: none;
+    .filter-static-branch {
+        width: 100%;
+        height: 40px;
+        padding: 6px 12px;
+        border: 1.5px solid #e2e8f0;
         border-radius: 10px;
-        padding: 9px 20px;
+        background: #f8fafc;
+        color: #0f172a;
         font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        min-height: 40px;
-        cursor: pointer;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
-        display: inline-flex;
+        font-weight: 700;
+        display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 7px;
-        transition: all 0.15s ease;
-        flex-shrink: 0;
+        gap: 8px;
+        box-sizing: border-box;
     }
 
-    .btn-filter:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+    .filter-static-branch i.text-blue {
+        color: #2563eb;
     }
 
-    .btn-filter:active {
-        transform: scale(0.97);
-    }
-
-    @media (max-width: 640px) {
+    @media (max-width: 560px) {
         .filter-form {
-            flex-direction: column;
-            align-items: stretch;
+            grid-template-columns: 1fr;
             gap: 10px;
-        }
-        .filter-item,
-        .btn-filter {
-            width: 100%;
-            min-width: 0;
         }
     }
 
@@ -268,27 +297,31 @@
     .section-header-wrap {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin: 0 0 10px 0;
+        margin: 24px 0 14px 0;
+        padding: 0 4px;
     }
 
     .section-title {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 800;
         color: #0f172a;
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 9px;
+        letter-spacing: -0.01em;
     }
 
-    .section-title i {
+    .section-title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: #eff6ff;
         color: #2563eb;
-    }
-
-    .section-count {
-        font-size: 12px;
-        color: #64748b;
-        font-weight: 600;
+        font-size: 13px;
+        flex-shrink: 0;
     }
 
     .table-card {
@@ -553,17 +586,18 @@
         text-align: center;
     }
 
-    @media (max-width: 480px) {
-        .fluent-pagination {
-            gap: 4px;
-            padding: 4px 6px;
-        }
-        .fluent-page-btn {
-            min-width: 32px;
-            height: 32px;
-            font-size: 12px;
-            padding: 0 8px;
-        }
+    /* ─── AJAX LOADING STATE ─── */
+    #laporan-main-content,
+    #laporan-rincian-container {
+        position: relative;
+        transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    #laporan-main-content.is-loading,
+    #laporan-rincian-container.is-loading {
+        opacity: 0.45;
+        filter: blur(1px);
+        pointer-events: none;
     }
 </style>
 @endpush
@@ -571,16 +605,28 @@
 @section('content')
 <div class="page-shell">
 
+    <!-- TAB SWITCHER LAPORAN -->
+    <div class="laporan-nav-tabs">
+        <a href="{{ route('laporan.index') }}" class="laporan-tab-btn active">
+            <i class="fas fa-chart-line"></i>
+            <span>Laporan Penjualan</span>
+        </a>
+        <a href="{{ route('laporan.stok') }}" class="laporan-tab-btn">
+            <i class="fas fa-boxes-stacked"></i>
+            <span>Laporan Stok Ikan</span>
+        </a>
+    </div>
+
     <!-- 1. PANEL FILTER (BULAN & CABANG) -->
     <div class="filter-card">
-        <form method="GET" action="{{ route('laporan.index') }}" class="filter-form">
+        <form method="GET" action="{{ route('laporan.index') }}" class="filter-form" id="laporanFilterForm">
             <!-- Filter Bulan -->
             <div class="filter-item">
-                <label>
+                <label for="filterBulan">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Bulan</span>
+                    <span>Pilih Bulan</span>
                 </label>
-                <select name="bulan" class="filter-select">
+                <select name="bulan" id="filterBulan" class="filter-select">
                     @for($m = 0; $m < 12; $m++)
                         @php $mo = now()->subMonths($m)->format('Y-m'); @endphp
                         <option value="{{ $mo }}" {{ $bulan === $mo ? 'selected' : '' }}>
@@ -590,297 +636,317 @@
                 </select>
             </div>
 
-            <!-- Filter Cabang (Khusus Admin) -->
             @if(Auth::user()->role === 'admin')
+            <!-- Filter Cabang (Khusus Admin) -->
             <div class="filter-item">
-                <label>
+                <label for="filterCabang">
                     <i class="fas fa-store"></i>
-                    <span>Cabang</span>
+                    <span>Pilih Cabang</span>
                 </label>
-                <select name="cabang" class="filter-select">
-                    <option value="semua" {{ $cabang === 'semua' ? 'selected' : '' }}>Semua Cabang</option>
-                    @foreach($daftarCabang as $c)
-                        <option value="{{ $c }}" {{ $cabang === $c ? 'selected' : '' }}>{{ $c }}</option>
-                    @endforeach
+                <select name="cabang" id="filterCabang" class="filter-select">
+                    <option value="semua" {{ ($cabang ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua Cabang</option>
+                    <option value="Suci" {{ ($cabang ?? '') === 'Suci' ? 'selected' : '' }}>Suci</option>
+                    <option value="Cilawu" {{ ($cabang ?? '') === 'Cilawu' ? 'selected' : '' }}>Cilawu</option>
+                    <option value="Samarang" {{ ($cabang ?? '') === 'Samarang' ? 'selected' : '' }}>Samarang</option>
                 </select>
             </div>
+            @else
+            <!-- Lokasi Cabang Tetap (Khusus Kepala Cabang) -->
+            <div class="filter-item">
+                <label>
+                    <i class="fas fa-location-dot"></i>
+                    <span>Lokasi Cabang</span>
+                </label>
+                <div class="filter-static-branch">
+                    <i class="fas fa-store text-blue"></i>
+                    <span>Cabang {{ Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? $cabang) }}</span>
+                </div>
+                <input type="hidden" name="cabang" value="{{ Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? $cabang) }}">
+            </div>
             @endif
-
-            <!-- Tombol Tampilkan -->
-            <button type="submit" class="btn-filter">
-                <i class="fas fa-filter"></i>
-                <span>TAMPILKAN</span>
-            </button>
         </form>
     </div>
 
-    <!-- 2. EMPAT KARTU RINGKASAN (SEJAJAR & SIMETRIS) -->
-    <div class="summary-grid">
-        <!-- Pendapatan (Lunas) -->
-        <div class="summary-card pendapatan">
-            <div class="summary-title">
-                <span>Pendapatan Lunas</span>
-                <i class="fas fa-check-circle" style="color: #059669; font-size: 13px;"></i>
-            </div>
-            <div class="summary-value">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
-        </div>
-
-        <!-- Piutang (Belum Lunas) -->
-        <div class="summary-card piutang">
-            <div class="summary-title">
-                <span>Piutang</span>
-                <i class="fas fa-clock" style="color: #e11d48; font-size: 13px;"></i>
-            </div>
-            <div class="summary-value">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</div>
-        </div>
-
-        <!-- Total Ikan Terjual -->
-        <div class="summary-card terjual">
-            <div class="summary-title">
-                <span>Total Ikan Terjual</span>
-                <i class="fas fa-fish" style="color: #2563eb; font-size: 13px;"></i>
-            </div>
-            <div class="summary-value">{{ number_format($totalKg, 1, ',', '.') }} Kg</div>
-        </div>
-
-        <!-- Jumlah Transaksi -->
-        <div class="summary-card transaksi">
-            <div class="summary-title">
-                <span>Jumlah Transaksi</span>
-                <i class="fas fa-receipt" style="color: #7c3aed; font-size: 13px;"></i>
-            </div>
-            <div class="summary-value">{{ $totalTransaksi }} Transaksi</div>
-        </div>
-    </div>
-
-    <!-- 3. GRAFIK PENDAPATAN HARIAN (RINGKAS & PROPORIONAL) -->
-    <div class="revenue-panel">
-        <div class="revenue-panel-header">
-            <div>
-                <div class="revenue-panel-title">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Grafik Pendapatan Harian</span>
+    <!-- MAIN DATA CONTAINER UNTUK AJAX FILTER -->
+    <div id="laporan-main-content">
+        <!-- 2. EMPAT KARTU RINGKASAN (SEJAJAR & SIMETRIS) -->
+        <div class="summary-grid">
+            <!-- Pendapatan (Lunas) -->
+            <div class="summary-card pendapatan">
+                <div class="summary-title">
+                    <span>Pendapatan Lunas</span>
+                    <i class="fas fa-check-circle" style="color: #059669; font-size: 13px;"></i>
                 </div>
-                <div class="revenue-panel-sub">
-                    Periode {{ Carbon\Carbon::parse($bulan)->isoFormat('MMMM YYYY') }} &bull; Cabang: <strong>{{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }}</strong>
+                <div class="summary-value">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
+            </div>
+
+            <!-- Piutang (Belum Lunas) -->
+            <div class="summary-card piutang">
+                <div class="summary-title">
+                    <span>Piutang</span>
+                    <i class="fas fa-clock" style="color: #e11d48; font-size: 13px;"></i>
                 </div>
+                <div class="summary-value">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</div>
             </div>
-            <div class="revenue-badge-total">
-                <i class="fas fa-wallet"></i>
-                <span>Total: Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</span>
-            </div>
-        </div>
-        <div class="revenue-chart-wrap">
-            <canvas id="laporanRevenueChart"></canvas>
-        </div>
-    </div>
 
-    <!-- 4. RINCIAN TRANSAKSI -->
-    <div class="section-header-wrap">
-        <div class="section-title">
-            <i class="fas fa-list-alt"></i>
-            <span>Rincian Transaksi ({{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }})</span>
-        </div>
-        <div class="section-count">
-            Total {{ $transaksi->total() }} Transaksi
-        </div>
-    </div>
-
-    <!-- Tampilan Desktop: Tabel Rapi -->
-    <div class="table-card">
-        <div class="table-wrapper">
-            <table class="tabel-sederhana">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Pembeli</th>
-                        <th>Cabang</th>
-                        <th>Ikan</th>
-                        <th>Berat</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($transaksi as $t)
-                    <tr>
-                        <td style="color: #64748b; font-size: 12px; white-space: nowrap;">
-                            {{ $t->tanggal_transaksi->format('d/m/Y') }}
-                        </td>
-                        <td style="font-weight: 700; color: #0f172a;">
-                            {{ $t->pembeli_nama }}
-                        </td>
-                        <td>
-                            <span class="badge-cabang-sm">
-                                {{ $t->cabangRelasi ? $t->cabangRelasi->nama_cabang : ($t->cabang ?? '-') }}
-                            </span>
-                        </td>
-                        <td>
-                            @if($t->details && $t->details->count() > 0)
-                                <div style="display: flex; flex-direction: column; gap: 3px;">
-                                    @foreach($t->details as $d)
-                                        <div>{{ $d->ikan ? $d->ikan->nama_ikan : '-' }} <span style="color: #64748b; font-size: 12px;">({{ $d->jumlah_kg }} Kg)</span></div>
-                                    @endforeach
-                                </div>
-                            @else
-                                {{ $t->ikan ? $t->ikan->nama_ikan : '-' }}
-                            @endif
-                        </td>
-                        <td style="font-weight: 600; color: #475569;">
-                            {{ number_format($t->jumlah_kg, 2) }} Kg
-                        </td>
-                        <td style="font-weight: 800; color: #0f172a; white-space: nowrap;">
-                            Rp {{ number_format($t->total, 0, ',', '.') }}
-                        </td>
-                        <td>
-                            @if($t->status == 'lunas')
-                                <span class="status-badge lunas"><i class="fas fa-check"></i> LUNAS</span>
-                            @elseif($t->status == 'dp')
-                                <span class="status-badge dp"><i class="fas fa-clock"></i> DP</span>
-                            @else
-                                <span class="status-badge belum"><i class="fas fa-times"></i> BELUM</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <div>Tidak ada transaksi pada filter ini.</div>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Tampilan Mobile: Card Rapi & Bersih -->
-    <div class="mobile-list">
-        @forelse($transaksi as $t)
-        <div class="mobile-tx-card">
-            <div class="mobile-tx-head">
-                <div class="mobile-tx-name">{{ $t->pembeli_nama }}</div>
-                <div class="mobile-tx-total">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
+            <!-- Total Ikan Terjual -->
+            <div class="summary-card terjual">
+                <div class="summary-title">
+                    <span>Total Ikan Terjual</span>
+                    <i class="fas fa-fish" style="color: #2563eb; font-size: 13px;"></i>
+                </div>
+                <div class="summary-value">{{ number_format($totalKg, 1, ',', '.') }} Kg</div>
             </div>
-            <div class="mobile-tx-meta">
-                <span>{{ $t->tanggal_transaksi->format('d M Y') }} &bull; {{ $t->cabangRelasi ? $t->cabangRelasi->nama_cabang : ($t->cabang ?? '-') }}</span>
-                <span style="font-weight: 700; color: #0f172a;">{{ number_format($t->jumlah_kg, 2) }} Kg</span>
+
+            <!-- Jumlah Transaksi -->
+            <div class="summary-card transaksi">
+                <div class="summary-title">
+                    <span>Jumlah Transaksi</span>
+                    <i class="fas fa-receipt" style="color: #7c3aed; font-size: 13px;"></i>
+                </div>
+                <div class="summary-value">{{ $totalTransaksi }} Transaksi</div>
             </div>
-            
-            <div class="mobile-tx-items">
-                @if($t->details && $t->details->count() > 0)
-                    @foreach($t->details as $d)
-                        <div class="mobile-tx-item-row">
-                            <span>• {{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span>
-                            <span style="color: #64748b; font-family: monospace;">{{ number_format($d->jumlah_kg, 2) }} Kg</span>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="mobile-tx-item-row">
-                        <span>• {{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
-                        <span style="color: #64748b; font-family: monospace;">{{ number_format($t->jumlah_kg, 2) }} Kg</span>
+        </div>
+
+        <!-- 3. GRAFIK PENDAPATAN HARIAN (RINGKAS & PROPORIONAL) -->
+        <div class="revenue-panel">
+            <div class="revenue-panel-header">
+                <div>
+                    <div class="revenue-panel-title">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Grafik Pendapatan Harian</span>
                     </div>
-                @endif
+                    <div class="revenue-panel-sub">
+                        Periode {{ Carbon\Carbon::parse($bulan)->isoFormat('MMMM YYYY') }} &bull; Cabang: <strong>{{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }}</strong>
+                    </div>
+                </div>
+                <div class="revenue-badge-total">
+                    <i class="fas fa-wallet"></i>
+                    <span>Total: Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</span>
+                </div>
+            </div>
+            <div class="revenue-chart-wrap" id="revenueChartContainer" data-labels="{{ json_encode($chartLabels ?? []) }}" data-values="{{ json_encode($chartValues ?? []) }}">
+                <canvas id="laporanRevenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 4. RINCIAN TRANSAKSI (CONTAINER AJAX PAGINATION) -->
+        <div id="laporan-rincian-container">
+            <div class="section-header-wrap">
+                <div class="section-title">
+                    <span class="section-title-icon">
+                        <i class="fas fa-list-alt"></i>
+                    </span>
+                    <span>Rincian Transaksi ({{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }})</span>
+                </div>
             </div>
 
-            <div class="mobile-tx-footer">
-                @if($t->status == 'lunas')
-                    <span class="status-badge lunas"><i class="fas fa-check"></i> LUNAS</span>
-                @elseif($t->status == 'dp')
-                    <span class="status-badge dp"><i class="fas fa-clock"></i> DP</span>
-                @else
-                    <span class="status-badge belum"><i class="fas fa-times"></i> BELUM</span>
-                @endif
+            <!-- Tampilan Desktop: Tabel Rapi -->
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="tabel-sederhana">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Pembeli</th>
+                                <th>Cabang</th>
+                                <th>Ikan</th>
+                                <th>Berat</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($transaksi as $t)
+                            <tr>
+                                <td style="color: #64748b; font-size: 12px; white-space: nowrap;">
+                                    {{ $t->tanggal_transaksi->format('d/m/Y') }}
+                                </td>
+                                <td style="font-weight: 700; color: #0f172a;">
+                                    {{ $t->pembeli_nama }}
+                                </td>
+                                <td>
+                                    <span class="badge-cabang-sm">
+                                        {{ $t->cabangRelasi ? $t->cabangRelasi->nama_cabang : ($t->cabang ?? '-') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($t->details && $t->details->count() > 0)
+                                        <div style="display: flex; flex-direction: column; gap: 3px;">
+                                            @foreach($t->details as $d)
+                                                <div>{{ $d->ikan ? $d->ikan->nama_ikan : '-' }} <span style="color: #64748b; font-size: 12px;">({{ $d->jumlah_kg }} Kg)</span></div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        {{ $t->ikan ? $t->ikan->nama_ikan : '-' }}
+                                    @endif
+                                </td>
+                                <td style="font-weight: 600; color: #475569;">
+                                    {{ number_format($t->jumlah_kg, 2) }} Kg
+                                </td>
+                                <td style="font-weight: 800; color: #0f172a; white-space: nowrap;">
+                                    Rp {{ number_format($t->total, 0, ',', '.') }}
+                                </td>
+                                <td>
+                                    @if($t->status == 'lunas')
+                                        <span class="status-badge lunas"><i class="fas fa-check"></i> LUNAS</span>
+                                    @elseif($t->status == 'dp')
+                                        <span class="status-badge dp"><i class="fas fa-clock"></i> DP</span>
+                                    @else
+                                        <span class="status-badge belum"><i class="fas fa-times"></i> BELUM</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <div>Tidak ada transaksi pada filter ini.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <!-- Tampilan Mobile: Card Rapi & Bersih -->
+            <div class="mobile-list">
+                @forelse($transaksi as $t)
+                <div class="mobile-tx-card">
+                    <div class="mobile-tx-head">
+                        <div class="mobile-tx-name">{{ $t->pembeli_nama }}</div>
+                        <div class="mobile-tx-total">Rp {{ number_format($t->total, 0, ',', '.') }}</div>
+                    </div>
+                    <div class="mobile-tx-meta">
+                        <span>{{ $t->tanggal_transaksi->format('d M Y') }} &bull; {{ $t->cabangRelasi ? $t->cabangRelasi->nama_cabang : ($t->cabang ?? '-') }}</span>
+                        <span style="font-weight: 700; color: #0f172a;">{{ number_format($t->jumlah_kg, 2) }} Kg</span>
+                    </div>
+                    
+                    <div class="mobile-tx-items">
+                        @if($t->details && $t->details->count() > 0)
+                            @foreach($t->details as $d)
+                                <div class="mobile-tx-item-row">
+                                    <span>• {{ $d->ikan ? $d->ikan->nama_ikan : '-' }}</span>
+                                    <span style="color: #64748b; font-family: monospace;">{{ number_format($d->jumlah_kg, 2) }} Kg</span>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="mobile-tx-item-row">
+                                <span>• {{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
+                                <span style="color: #64748b; font-family: monospace;">{{ number_format($t->jumlah_kg, 2) }} Kg</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="mobile-tx-footer">
+                        @if($t->status == 'lunas')
+                            <span class="status-badge lunas"><i class="fas fa-check"></i> LUNAS</span>
+                        @elseif($t->status == 'dp')
+                            <span class="status-badge dp"><i class="fas fa-clock"></i> DP</span>
+                        @else
+                            <span class="status-badge belum"><i class="fas fa-times"></i> BELUM</span>
+                        @endif
+                    </div>
+                </div>
+                @empty
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <div>Tidak ada transaksi pada filter ini.</div>
+                </div>
+                @endforelse
+            </div>
+
+            <!-- 5. TOMBOL PAGINATION FLUENT MINIMALIST (POSISI TENGAH) -->
+            @if ($transaksi->hasPages())
+            <div class="fluent-pagination-container">
+                <nav class="fluent-pagination" role="navigation" aria-label="Navigasi Halaman">
+                    {{-- Tombol Sebelumnya --}}
+                    @if ($transaksi->onFirstPage())
+                        <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Sebelumnya">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    @else
+                        <a href="{{ $transaksi->previousPageUrl() }}" class="fluent-page-btn" rel="prev" title="Halaman Sebelumnya">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    @endif
+
+                    {{-- Nomor Halaman --}}
+                    @php
+                        $start = max(1, $transaksi->currentPage() - 2);
+                        $end = min($transaksi->lastPage(), $transaksi->currentPage() + 2);
+                    @endphp
+
+                    @if($start > 1)
+                        <a href="{{ $transaksi->url(1) }}" class="fluent-page-btn">1</a>
+                        @if($start > 2)
+                            <span class="fluent-page-dots">...</span>
+                        @endif
+                    @endif
+
+                    @for ($page = $start; $page <= $end; $page++)
+                        @if ($page == $transaksi->currentPage())
+                            <span class="fluent-page-btn active" aria-current="page">{{ $page }}</span>
+                        @else
+                            <a href="{{ $transaksi->url($page) }}" class="fluent-page-btn">{{ $page }}</a>
+                        @endif
+                    @endfor
+
+                    @if($end < $transaksi->lastPage())
+                        @if($end < $transaksi->lastPage() - 1)
+                            <span class="fluent-page-dots">...</span>
+                        @endif
+                        <a href="{{ $transaksi->url($transaksi->lastPage()) }}" class="fluent-page-btn">{{ $transaksi->lastPage() }}</a>
+                    @endif
+
+                    {{-- Tombol Selanjutnya --}}
+                    @if ($transaksi->hasMorePages())
+                        <a href="{{ $transaksi->nextPageUrl() }}" class="fluent-page-btn" rel="next" title="Halaman Selanjutnya">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Selanjutnya">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    @endif
+                </nav>
+                <div class="fluent-page-info">
+                    Menampilkan {{ $transaksi->firstItem() ?? 0 }} - {{ $transaksi->lastItem() ?? 0 }} dari {{ $transaksi->total() }} transaksi
+                </div>
+            </div>
+            @endif
         </div>
-        @empty
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <div>Tidak ada transaksi pada filter ini.</div>
-        </div>
-        @endforelse
     </div>
-
-    <!-- 5. TOMBOL PAGINATION FLUENT MINIMALIST (POSISI TENGAH) -->
-    @if ($transaksi->hasPages())
-    <div class="fluent-pagination-container">
-        <nav class="fluent-pagination" role="navigation" aria-label="Navigasi Halaman">
-            {{-- Tombol Sebelumnya --}}
-            @if ($transaksi->onFirstPage())
-                <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Sebelumnya">
-                    <i class="fas fa-chevron-left"></i>
-                </span>
-            @else
-                <a href="{{ $transaksi->previousPageUrl() }}" class="fluent-page-btn" rel="prev" title="Halaman Sebelumnya">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-            @endif
-
-            {{-- Nomor Halaman --}}
-            @php
-                $start = max(1, $transaksi->currentPage() - 2);
-                $end = min($transaksi->lastPage(), $transaksi->currentPage() + 2);
-            @endphp
-
-            @if($start > 1)
-                <a href="{{ $transaksi->url(1) }}" class="fluent-page-btn">1</a>
-                @if($start > 2)
-                    <span class="fluent-page-dots">...</span>
-                @endif
-            @endif
-
-            @for ($page = $start; $page <= $end; $page++)
-                @if ($page == $transaksi->currentPage())
-                    <span class="fluent-page-btn active" aria-current="page">{{ $page }}</span>
-                @else
-                    <a href="{{ $transaksi->url($page) }}" class="fluent-page-btn">{{ $page }}</a>
-                @endif
-            @endfor
-
-            @if($end < $transaksi->lastPage())
-                @if($end < $transaksi->lastPage() - 1)
-                    <span class="fluent-page-dots">...</span>
-                @endif
-                <a href="{{ $transaksi->url($transaksi->lastPage()) }}" class="fluent-page-btn">{{ $transaksi->lastPage() }}</a>
-            @endif
-
-            {{-- Tombol Selanjutnya --}}
-            @if ($transaksi->hasMorePages())
-                <a href="{{ $transaksi->nextPageUrl() }}" class="fluent-page-btn" rel="next" title="Halaman Selanjutnya">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            @else
-                <span class="fluent-page-btn disabled" aria-disabled="true" title="Halaman Selanjutnya">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            @endif
-        </nav>
-        <div class="fluent-page-info">
-            Menampilkan {{ $transaksi->firstItem() ?? 0 }} - {{ $transaksi->lastItem() ?? 0 }} dari {{ $transaksi->total() }} transaksi
-        </div>
-    </div>
-    @endif
 
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    const chartLabels = @json($chartLabels ?? []);
-    const chartValues = @json($chartValues ?? []);
+    let laporanChart = null;
 
-    if (document.getElementById('laporanRevenueChart') && chartLabels.length > 0) {
-        const ctx = document.getElementById('laporanRevenueChart').getContext('2d');
-        new Chart(ctx, {
+    function renderLaporanChart(labels, values) {
+        const canvas = document.getElementById('laporanRevenueChart');
+        if (!canvas) return;
+
+        if (laporanChart) {
+            laporanChart.destroy();
+            laporanChart = null;
+        }
+
+        if (!labels || labels.length === 0) return;
+
+        const ctx = canvas.getContext('2d');
+        laporanChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: chartLabels,
+                labels: labels,
                 datasets: [{
                     label: 'Pendapatan',
-                    data: chartValues,
+                    data: values,
                     borderRadius: 6,
                     backgroundColor: 'rgba(37, 99, 235, 0.85)',
                     hoverBackgroundColor: '#1d4ed8',
@@ -929,5 +995,136 @@
             }
         });
     }
+
+    // Inisialisasi awal chart dari data-attribute
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartWrap = document.getElementById('revenueChartContainer');
+        if (chartWrap) {
+            try {
+                const labels = JSON.parse(chartWrap.getAttribute('data-labels') || '[]');
+                const values = JSON.parse(chartWrap.getAttribute('data-values') || '[]');
+                renderLaporanChart(labels, values);
+            } catch (e) {
+                console.error('Failed to parse initial chart data:', e);
+            }
+        }
+    });
+
+    // ─── AJAX PAGINATION RINCIAN TRANSAKSI (TANPA REFRESH HALAMAN) ───
+    async function loadLaporanRincian(url, updateHistory = true) {
+        const rincianContainer = document.getElementById('laporan-rincian-container');
+        if (!rincianContainer) return;
+
+        rincianContainer.classList.add('is-loading');
+
+        try {
+            const response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) throw new Error('Gagal mengambil rincian data transaksi');
+
+            const htmlText = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const newContent = doc.getElementById('laporan-rincian-container');
+
+            if (newContent) {
+                rincianContainer.innerHTML = newContent.innerHTML;
+            }
+
+            if (updateHistory) {
+                history.pushState(null, '', url);
+            }
+
+            // Scroll halus ke awal bagian rincian transaksi
+            rincianContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+            console.error('AJAX Error:', error);
+            window.location.href = url;
+        } finally {
+            rincianContainer.classList.remove('is-loading');
+        }
+    }
+
+    // ─── AJAX FILTER PENJUALAN (UPDATE RINGKASAN, GRAFIK & RINCIAN) ───
+    async function loadLaporanFull(url, updateHistory = true) {
+        const mainContainer = document.getElementById('laporan-main-content');
+        if (!mainContainer) return;
+
+        mainContainer.classList.add('is-loading');
+
+        try {
+            const response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) throw new Error('Gagal memuat laporan');
+
+            const htmlText = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const newMain = doc.getElementById('laporan-main-content');
+
+            if (newMain) {
+                mainContainer.innerHTML = newMain.innerHTML;
+
+                // Re-render chart dengan data baru
+                const chartWrap = mainContainer.querySelector('#revenueChartContainer');
+                if (chartWrap) {
+                    try {
+                        const labels = JSON.parse(chartWrap.getAttribute('data-labels') || '[]');
+                        const values = JSON.parse(chartWrap.getAttribute('data-values') || '[]');
+                        renderLaporanChart(labels, values);
+                    } catch (e) {
+                        console.error('Failed to parse dynamic chart data:', e);
+                    }
+                }
+            }
+
+            if (updateHistory) {
+                history.pushState(null, '', url);
+            }
+        } catch (error) {
+            console.error('AJAX Filter Error:', error);
+            window.location.href = url;
+        } finally {
+            mainContainer.classList.remove('is-loading');
+        }
+    }
+
+    // Tangkap klik pagination rincian transaksi
+    document.addEventListener('click', function(e) {
+        const pageLink = e.target.closest('#laporan-rincian-container .fluent-page-btn[href]');
+        if (pageLink) {
+            e.preventDefault();
+            loadLaporanRincian(pageLink.href);
+        }
+    });
+
+    // ─── TRIGGER FILTER OTOMATIS (INSTAN SAAT DROPDOWN BULAN / CABANG BERUBAH) ───
+    function executeLaporanFilter() {
+        const filterForm = document.getElementById('laporanFilterForm');
+        if (!filterForm) return;
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData);
+        const actionUrl = filterForm.action + '?' + params.toString();
+        loadLaporanFull(actionUrl);
+    }
+
+    const filterBulan = document.getElementById('filterBulan');
+    if (filterBulan) {
+        filterBulan.addEventListener('change', executeLaporanFilter);
+    }
+
+    const filterCabang = document.getElementById('filterCabang');
+    if (filterCabang) {
+        filterCabang.addEventListener('change', executeLaporanFilter);
+    }
+
+    // Support browser Back/Forward navigation
+    window.addEventListener('popstate', function() {
+        loadLaporanFull(window.location.href, false);
+    });
 </script>
 @endpush

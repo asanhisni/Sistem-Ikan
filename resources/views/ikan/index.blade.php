@@ -6,27 +6,40 @@
 @push('styles')
 <style>
     .page-shell {
-        max-width: 1100px;
+        max-width: 1040px;
         margin: 0 auto;
+        padding-bottom: 24px;
     }
 
     .toolbar {
-        margin-bottom: 18px;
+        margin-bottom: 16px;
     }
 
     .btn-tambah {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        background: linear-gradient(135deg, #1e88e5, #1565c0);
+        gap: 8px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
         color: white;
         padding: 12px 18px;
         border-radius: 12px;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 800;
         text-decoration: none;
-        box-shadow: 0 8px 20px rgba(30,136,229,0.18);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-tambah:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-tambah:active {
+        transform: scale(0.98);
     }
 
     .alert-sukses {
@@ -38,15 +51,17 @@
         border: 1px solid #cfeecf;
         border-radius: 12px;
         padding: 12px 14px;
-        margin-bottom: 18px;
-        font-weight: 600;
+        margin-bottom: 16px;
+        font-weight: 700;
+        font-size: 13.5px;
     }
 
+    /* ─── DESKTOP TABLE CARD ─── */
     .table-card {
-        background: rgba(255,255,255,0.96);
-        border-radius: 18px;
-        border: 1px solid rgba(15,23,36,0.05);
-        box-shadow: 0 10px 30px rgba(11,35,60,0.04);
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
         overflow: hidden;
     }
 
@@ -63,53 +78,56 @@
     .tabel-sederhana th {
         text-align: left;
         padding: 12px 16px;
-        background: #f8fbff;
-        color: var(--text-muted);
+        background: #f8fafc;
+        color: #64748b;
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        border-bottom: 1px solid #edf3f9;
+        letter-spacing: 0.06em;
+        border-bottom: 1px solid #eef2f6;
     }
 
     .tabel-sederhana td {
-        padding: 16px;
+        padding: 14px 16px;
         border-bottom: 1px solid #f1f5f9;
-        color: var(--text);
+        color: #0f172a;
         font-size: 14px;
         vertical-align: middle;
     }
 
     .tabel-sederhana tbody tr:hover {
-        background: #fafcff;
+        background: #f8fafc;
     }
 
     .nama-item {
         font-size: 15px;
         font-weight: 800;
-        color: var(--text);
+        color: #0f172a;
     }
 
     .harga-item {
         font-size: 14px;
         font-weight: 800;
-        color: var(--blue);
+        color: #0f172a;
     }
 
     .stok-badge {
         display: inline-flex;
         align-items: center;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-weight: 800;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
         font-size: 12px;
-        background: var(--green-light);
-        color: var(--green);
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
-    .stok-rendah {
-        background: var(--red-light);
-        color: var(--red);
+    .stok-badge.stok-rendah {
+        background: #ffe4e6;
+        color: #9f1239;
+        border: 1px solid rgba(244, 63, 94, 0.25);
     }
 
     .btn-aksi {
@@ -124,69 +142,88 @@
         border: none;
         cursor: pointer;
         margin-right: 6px;
+        font-size: 13px;
+        transition: transform 0.1s, opacity 0.15s, box-shadow 0.15s;
     }
 
-    .btn-edit { background: #ffb300; }
-    .btn-hapus { background: var(--red); }
+    .btn-aksi:active {
+        transform: scale(0.94);
+    }
 
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+    }
+    .btn-edit:hover {
+        background: #d97706;
+    }
+
+    .btn-hapus {
+        background: #ef4444;
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+    }
+    .btn-hapus:hover {
+        background: #dc2626;
+    }
+
+    /* ─── MOBILE LIST & FLOATING CARDS ─── */
     .mobile-list {
         display: none;
+        flex-direction: column;
+        gap: 12px;
     }
 
-    .mobile-card {
-        background: rgba(255,255,255,0.96);
-        border: 1px solid rgba(15,23,36,0.06);
-        border-radius: 18px;
-        box-shadow: 0 10px 24px rgba(11,35,60,0.04);
-        padding: 14px;
-        margin-bottom: 12px;
+    .floating-ikan-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .mobile-head {
+    .floating-ikan-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+    }
+
+    .ikan-row-top {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        margin-bottom: 8px;
     }
 
-    .mobile-name {
+    .ikan-nama-title {
         font-size: 15px;
         font-weight: 800;
-        color: var(--text);
+        color: #0f172a;
+        line-height: 1.2;
     }
 
-    .mobile-meta {
+    .ikan-row-bottom {
         display: flex;
-        flex-wrap: wrap;
+        align-items: center;
         justify-content: space-between;
         gap: 8px;
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-bottom: 12px;
     }
 
-    .mobile-actions {
+    .ikan-harga-val {
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .ikan-action-buttons {
         display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-    }
-
-    .mobile-btn {
-        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        color: white;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
+        gap: 6px;
     }
-
-    .mobile-btn.edit { background: #ffb300; }
-    .mobile-btn.delete { background: var(--red); }
 
     .empty-state {
         display: flex;
@@ -194,30 +231,26 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        min-height: 180px;
+        min-height: 160px;
         text-align: center;
-        color: var(--text-muted);
-        background: rgba(255,255,255,0.9);
-        border: 1px solid rgba(15,23,36,0.05);
-        border-radius: 18px;
-        box-shadow: 0 8px 22px rgba(11,35,60,0.03);
+        color: #64748b;
+        background: #ffffff;
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
         padding: 24px 18px;
     }
 
     .empty-state i {
-        font-size: 38px;
-        opacity: 0.35;
+        font-size: 34px;
+        color: #94a3b8;
     }
 
     @media (max-width: 640px) {
-        .btn-tambah {
-            width: 100%;
-        }
         .table-card {
             display: none;
         }
         .mobile-list {
-            display: block;
+            display: flex;
         }
     }
 </style>
@@ -227,18 +260,30 @@
 <div class="page-shell">
     @if(session('success'))
     <div class="alert-sukses">
-        <i class="fas fa-check-circle" style="font-size: 22px;"></i>
+        <i class="fas fa-check-circle" style="font-size: 20px;"></i>
         <div>{{ session('success') }}</div>
     </div>
     @endif
 
+    @if(!empty($namaCabang))
+    <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; background: #ffffff; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #1e293b;">
+            <i class="fas fa-store" style="color: #2563eb;"></i>
+            <span>Stok Ikan Cabang: <strong>{{ $namaCabang }}</strong></span>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; background: #eff6ff; color: #2563eb; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;">Kepala Cabang</span>
+    </div>
+    @endif
+
+    <!-- TOMBOL TAMBAH IKAN FULL WIDTH -->
     <div class="toolbar">
         <a href="{{ route('ikan.create') }}" class="btn-tambah">
-            <i class="fas fa-plus-circle"></i>
+            <i class="fas fa-plus"></i>
             <span>Tambah Ikan</span>
         </a>
     </div>
 
+    <!-- TAMPILAN DESKTOP TABLE -->
     <div class="table-card">
         <div class="table-wrapper">
             <table class="tabel-sederhana">
@@ -265,11 +310,15 @@
                             </div>
                         </td>
                         <td>
-                            <a href="{{ route('ikan.edit', $i->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a href="{{ route('ikan.edit', $i->id) }}" class="btn-aksi btn-edit" title="Edit">
+                                <i class="fas fa-pen"></i>
+                            </a>
                             <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus ikan ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-aksi btn-hapus" title="Hapus"><i class="fas fa-trash"></i></button>
+                                <button type="submit" class="btn-aksi btn-hapus" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
@@ -288,26 +337,35 @@
         </div>
     </div>
 
+    <!-- TAMPILAN MOBILE: KARTU MENGAMBANG PADAT & RAPI -->
     <div class="mobile-list">
         @forelse($ikan as $i)
-        <div class="mobile-card">
-            <div class="mobile-head">
-                <div class="mobile-name">{{ $i->nama_ikan }}</div>
+        <div class="floating-ikan-card">
+            <!-- Baris Atas: Nama Ikan (Kiri) & Badge Stok (Kanan) -->
+            <div class="ikan-row-top">
+                <div class="ikan-nama-title">{{ $i->nama_ikan }}</div>
                 <div class="stok-badge {{ $i->stok_kg <= 10 ? 'stok-rendah' : '' }}">
                     {{ number_format($i->stok_kg, 1, ',', '') }} Kg
                 </div>
             </div>
-            <div class="mobile-meta">
-                <span>Harga</span>
-                <span class="harga-item">Rp {{ number_format($i->harga_per_kg, 0, ',', '.') }}</span>
-            </div>
-            <div class="mobile-actions">
-                <a href="{{ route('ikan.edit', $i->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" onsubmit="return confirm('Hapus ikan ini?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="mobile-btn delete" title="Hapus"><i class="fas fa-trash"></i></button>
-                </form>
+
+            <!-- Baris Bawah: Harga (Kiri) & Tombol Edit/Hapus (Kanan) -->
+            <div class="ikan-row-bottom">
+                <div class="ikan-harga-val">
+                    Rp {{ number_format($i->harga_per_kg, 0, ',', '.') }}
+                </div>
+                <div class="ikan-action-buttons">
+                    <a href="{{ route('ikan.edit', $i->id) }}" class="btn-aksi btn-edit" title="Edit">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" onsubmit="return confirm('Hapus ikan ini?');" style="margin:0;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-aksi btn-hapus" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         @empty
@@ -319,3 +377,4 @@
     </div>
 </div>
 @endsection
+

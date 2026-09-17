@@ -8,6 +8,7 @@ use App\Models\Pelanggan;
 use App\Models\Ikan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransaksiController extends Controller
 {
@@ -81,82 +82,85 @@ class TransaksiController extends Controller
         $userCabangNama = $user->cabangRelasi ? $user->cabangRelasi->nama_cabang : ($user->cabang ?? 'Cilawu');
         $userCabangId = $user->cabang_id;
 
-        $total = 0;
-        $totalKg = 0;
-        $detailsData = [];
-        $firstIkanId = null;
+        return DB::transaction(function () use ($request, $userCabangNama, $userCabangId) {
+            $total = 0;
+            $totalKg = 0;
+            $detailsData = [];
+            $firstIkanId = null;
 
-        foreach ($request->items as $item) {
-            $ikanModel = Ikan::findOrFail($item['ikan_id']);
-            $kg = (float) $item['jumlah_kg'];
-            $subtotal = $ikanModel->harga_per_kg * $kg;
-            $total += $subtotal;
-            $totalKg += $kg;
+            foreach ($request->items as $item) {
+                $ikanModel = Ikan::findOrFail($item['ikan_id']);
+                $kg = (float) $item['jumlah_kg'];
+                $subtotal = $ikanModel->harga_per_kg * $kg;
+                $total += $subtotal;
+                $totalKg += $kg;
 
-            if (!$firstIkanId) {
-                $firstIkanId = $ikanModel->id;
+                if (!$firstIkanId) {
+                    $firstIkanId = $ikanModel->id;
+                }
+
+                $detailsData[] = [
+                    'ikan_id' => $ikanModel->id,
+                    'jumlah_kg' => $kg,
+                    'harga_per_kg' => $ikanModel->harga_per_kg,
+                    'subtotal' => $subtotal,
+                ];
+
+                // ─── OTOMATIS KURANGI STOK IKAN ───
+                $ikanModel->decrement('stok_kg', $kg);
             }
 
-            $detailsData[] = [
-                'ikan_id' => $ikanModel->id,
-                'jumlah_kg' => $kg,
-                'harga_per_kg' => $ikanModel->harga_per_kg,
-                'subtotal' => $subtotal,
-            ];
-        }
-
-        $jumlahDibayar = 0;
-        if ($request->status === 'lunas') {
-            $jumlahDibayar = $total;
-        } elseif ($request->status === 'dp') {
-            $jumlahDibayar = $request->jumlah_dibayar ?? 0;
-        }
-
-        // Cari atau buat Pelanggan otomatis (utamakan berdasarkan no HP)
-        $pelangganId = null;
-        $telepon = $request->telepon ? trim($request->telepon) : null;
-        $namaPembeli = trim($request->pembeli_nama);
-
-        if ($telepon) {
-            $pelanggan = Pelanggan::where('telepon', $telepon)->first();
-            if (!$pelanggan) {
-                // Buat pelanggan baru dengan no hp & nama
-                $pelanggan = Pelanggan::create([
-                    'nama' => $namaPembeli,
-                    'telepon' => $telepon,
-                    'cabang' => $userCabangNama,
-                ]);
+            $jumlahDibayar = 0;
+            if ($request->status === 'lunas') {
+                $jumlahDibayar = $total;
+            } elseif ($request->status === 'dp') {
+                $jumlahDibayar = $request->jumlah_dibayar ?? 0;
             }
-            $pelangganId = $pelanggan->id;
-        } else {
-            // Jika tidak ada no hp, cari berdasarkan nama yang persis
-            $pelanggan = Pelanggan::where('nama', $namaPembeli)->first();
-            if ($pelanggan) {
+
+            // Cari atau buat Pelanggan otomatis (utamakan berdasarkan no HP)
+            $pelangganId = null;
+            $telepon = $request->telepon ? trim($request->telepon) : null;
+            $namaPembeli = trim($request->pembeli_nama);
+
+            if ($telepon) {
+                $pelanggan = Pelanggan::where('telepon', $telepon)->first();
+                if (!$pelanggan) {
+                    $pelanggan = Pelanggan::create([
+                        'nama' => $namaPembeli,
+                        'telepon' => $telepon,
+                        'cabang' => $userCabangNama,
+                    ]);
+                }
                 $pelangganId = $pelanggan->id;
+            } else {
+                $pelanggan = Pelanggan::where('nama', $namaPembeli)->first();
+                if ($pelanggan) {
+                    $pelangganId = $pelanggan->id;
+                }
             }
-        }
 
-        $transaksi = Transaksi::create([
-            'pelanggan_id' => $pelangganId,
-            'pembeli_nama' => $namaPembeli,
-            'telepon' => $telepon,
-            'ikan_id' => $firstIkanId, // backward compatibility
-            'jumlah_kg' => $totalKg,
-            'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
-            'total' => $total,
-            'status' => $request->status,
-            'jumlah_dibayar' => $jumlahDibayar,
-            'tanggal_transaksi' => Carbon::now(),
-            'cabang' => $userCabangNama,
-            'cabang_id' => $userCabangId,
-            'keterangan' => $request->keterangan,
-        ]);
+            $transaksi = Transaksi::create([
+                'pelanggan_id' => $pelangganId,
+                'pembeli_nama' => $namaPembeli,
+                'telepon' => $telepon,
+                'ikan_id' => $firstIkanId,
+                'jumlah_kg' => $totalKg,
+                'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
+                'total' => $total,
+                'status' => $request->status,
+                'jumlah_dibayar' => $jumlahDibayar,
+                'tanggal_transaksi' => Carbon::now(),
+                'cabang' => $userCabangNama,
+                'cabang_id' => $userCabangId,
+                'keterangan' => $request->keterangan,
+            ]);
 
-        foreach ($detailsData as $detail) {
-            $transaksi->details()->create($detail);
-        }
+            foreach ($detailsData as $detail) {
+                $transaksi->details()->create($detail);
+            }
 
-        return redirect()->route('transaksi.show', $transaksi->id)->with('success', 'Transaksi berhasil disimpan!');
+            return redirect()->route('transaksi.show', $transaksi->id)->with('success', 'Transaksi berhasil disimpan dan stok ikan otomatis terpotong!');
+        });
     }
 
     public function show(Transaksi $transaksi)
@@ -189,80 +193,122 @@ class TransaksiController extends Controller
             'items.*.jumlah_kg.required' => 'Jumlah (Kg) harus diisi.',
         ]);
 
-        $total = 0;
-        $totalKg = 0;
-        $detailsData = [];
-        $firstIkanId = null;
-
-        foreach ($request->items as $item) {
-            $ikanModel = Ikan::findOrFail($item['ikan_id']);
-            $kg = (float) $item['jumlah_kg'];
-            $subtotal = $ikanModel->harga_per_kg * $kg;
-            $total += $subtotal;
-            $totalKg += $kg;
-
-            if (!$firstIkanId) {
-                $firstIkanId = $ikanModel->id;
+        return DB::transaction(function () use ($request, $transaksi) {
+            // ─── 1. KEMBALIKAN STOK LAMA TERLEBIH DAHULU ───
+            if ($transaksi->details && $transaksi->details->count() > 0) {
+                foreach ($transaksi->details as $oldDetail) {
+                    if ($oldDetail->ikan_id) {
+                        $oldIkan = Ikan::find($oldDetail->ikan_id);
+                        if ($oldIkan) {
+                            $oldIkan->increment('stok_kg', (float) $oldDetail->jumlah_kg);
+                        }
+                    }
+                }
+            } elseif ($transaksi->ikan_id) {
+                $oldIkan = Ikan::find($transaksi->ikan_id);
+                if ($oldIkan) {
+                    $oldIkan->increment('stok_kg', (float) $transaksi->jumlah_kg);
+                }
             }
 
-            $detailsData[] = [
-                'ikan_id' => $ikanModel->id,
-                'jumlah_kg' => $kg,
-                'harga_per_kg' => $ikanModel->harga_per_kg,
-                'subtotal' => $subtotal,
-            ];
-        }
+            // ─── 2. HITUNG & POTONG STOK BARU ───
+            $total = 0;
+            $totalKg = 0;
+            $detailsData = [];
+            $firstIkanId = null;
 
-        $jumlahDibayar = 0;
-        if ($request->status === 'lunas') {
-            $jumlahDibayar = $total;
-        } elseif ($request->status === 'dp') {
-            $jumlahDibayar = $request->jumlah_dibayar ?? 0;
-        }
+            foreach ($request->items as $item) {
+                $ikanModel = Ikan::findOrFail($item['ikan_id']);
+                $kg = (float) $item['jumlah_kg'];
+                $subtotal = $ikanModel->harga_per_kg * $kg;
+                $total += $subtotal;
+                $totalKg += $kg;
 
-        // Cari atau buat Pelanggan otomatis
-        $pelangganId = $transaksi->pelanggan_id;
-        $telepon = $request->telepon ? trim($request->telepon) : null;
-        $namaPembeli = trim($request->pembeli_nama);
+                if (!$firstIkanId) {
+                    $firstIkanId = $ikanModel->id;
+                }
 
-        if ($telepon) {
-            $pelanggan = Pelanggan::where('telepon', $telepon)->first();
-            if (!$pelanggan) {
-                $pelanggan = Pelanggan::create([
-                    'nama' => $namaPembeli,
-                    'telepon' => $telepon,
-                    'cabang' => $transaksi->cabang ?? 'Pusat',
-                ]);
+                $detailsData[] = [
+                    'ikan_id' => $ikanModel->id,
+                    'jumlah_kg' => $kg,
+                    'harga_per_kg' => $ikanModel->harga_per_kg,
+                    'subtotal' => $subtotal,
+                ];
+
+                // Kurangi stok ikan yang baru diinput
+                $ikanModel->decrement('stok_kg', $kg);
             }
-            $pelangganId = $pelanggan->id;
-        }
 
-        $transaksi->update([
-            'pelanggan_id' => $pelangganId,
-            'pembeli_nama' => $namaPembeli,
-            'telepon' => $telepon,
-            'ikan_id' => $firstIkanId,
-            'jumlah_kg' => $totalKg,
-            'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
-            'total' => $total,
-            'status' => $request->status,
-            'jumlah_dibayar' => $jumlahDibayar,
-            'keterangan' => $request->keterangan,
-        ]);
+            $jumlahDibayar = 0;
+            if ($request->status === 'lunas') {
+                $jumlahDibayar = $total;
+            } elseif ($request->status === 'dp') {
+                $jumlahDibayar = $request->jumlah_dibayar ?? 0;
+            }
 
-        // Hapus detail lama dan masukkan yang baru
-        $transaksi->details()->delete();
-        foreach ($detailsData as $detail) {
-            $transaksi->details()->create($detail);
-        }
+            $pelangganId = $transaksi->pelanggan_id;
+            $telepon = $request->telepon ? trim($request->telepon) : null;
+            $namaPembeli = trim($request->pembeli_nama);
 
-        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diubah!');
+            if ($telepon) {
+                $pelanggan = Pelanggan::where('telepon', $telepon)->first();
+                if (!$pelanggan) {
+                    $pelanggan = Pelanggan::create([
+                        'nama' => $namaPembeli,
+                        'telepon' => $telepon,
+                        'cabang' => $transaksi->cabang ?? 'Pusat',
+                    ]);
+                }
+                $pelangganId = $pelanggan->id;
+            }
+
+            $transaksi->update([
+                'pelanggan_id' => $pelangganId,
+                'pembeli_nama' => $namaPembeli,
+                'telepon' => $telepon,
+                'ikan_id' => $firstIkanId,
+                'jumlah_kg' => $totalKg,
+                'harga_per_kg' => count($detailsData) === 1 ? $detailsData[0]['harga_per_kg'] : 0,
+                'total' => $total,
+                'status' => $request->status,
+                'jumlah_dibayar' => $jumlahDibayar,
+                'keterangan' => $request->keterangan,
+            ]);
+
+            // Hapus detail lama dan masukkan yang baru
+            $transaksi->details()->delete();
+            foreach ($detailsData as $detail) {
+                $transaksi->details()->create($detail);
+            }
+
+            return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diubah dan stok ikan diperbarui!');
+        });
     }
 
     public function destroy(Transaksi $transaksi)
     {
-        $transaksi->details()->delete();
-        $transaksi->delete();
-        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dihapus!');
+        DB::transaction(function () use ($transaksi) {
+            // ─── KEMBALIKAN STOK JIKA TRANSAKSI DIHAPUS ───
+            if ($transaksi->details && $transaksi->details->count() > 0) {
+                foreach ($transaksi->details as $d) {
+                    if ($d->ikan_id) {
+                        $ikan = Ikan::find($d->ikan_id);
+                        if ($ikan) {
+                            $ikan->increment('stok_kg', (float) $d->jumlah_kg);
+                        }
+                    }
+                }
+            } elseif ($transaksi->ikan_id) {
+                $ikan = Ikan::find($transaksi->ikan_id);
+                if ($ikan) {
+                    $ikan->increment('stok_kg', (float) $transaksi->jumlah_kg);
+                }
+            }
+
+            $transaksi->details()->delete();
+            $transaksi->delete();
+        });
+
+        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dihapus dan stok ikan dikembalikan!');
     }
 }

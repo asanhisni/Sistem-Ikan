@@ -66,6 +66,14 @@
         color: #475569;
     }
 
+    .meta-pill.clock-pill {
+        background: #eff6ff;
+        border-color: #dbeafe;
+        color: #1e40af;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
     .meta-pill i {
         color: #2563eb;
         font-size: 10px;
@@ -271,6 +279,10 @@
                 <i class="fas fa-calendar-day"></i>
                 <span>{{ now()->isoFormat('D MMM YYYY') }}</span>
             </span>
+            <span class="meta-pill clock-pill">
+                <i class="fas fa-clock"></i>
+                <span id="liveClockText">{{ now()->timezone('Asia/Jakarta')->format('H:i:s') }} WIB</span>
+            </span>
         </div>
     </div>
 
@@ -345,3 +357,26 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function updateWibClock() {
+        const clockEl = document.getElementById('liveClockText');
+        if (!clockEl) return;
+
+        const now = new Date();
+        const options = {
+            timeZone: 'Asia/Jakarta',
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const timeFormatter = new Intl.DateTimeFormat('id-ID', options);
+        clockEl.textContent = timeFormatter.format(now).replace(/\./g, ':') + ' WIB';
+    }
+
+    setInterval(updateWibClock, 1000);
+    updateWibClock();
+</script>
+@endpush

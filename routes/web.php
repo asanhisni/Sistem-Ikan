@@ -33,5 +33,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pelanggan', PelangganController::class);
     Route::resource('ikan', IkanController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/stok', [LaporanController::class, 'stok'])->name('laporan.stok');
     Route::resource('users', UserController::class);
 });
