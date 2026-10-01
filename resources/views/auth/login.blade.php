@@ -492,12 +492,15 @@
                     @enderror
                 </div>
 
-                <!-- Remember Me -->
-                <div class="form-extras">
+                <!-- Remember Me & Lupa Password -->
+                <div class="form-extras" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                     <label class="checkbox-wrap">
                         <input type="checkbox" name="remember" id="remember">
                         <span>Ingat saya</span>
                     </label>
+                    <a href="{{ route('password.request') }}" style="font-size: 13px; font-weight: 700; color: #0077b6; text-decoration: none; transition: color 0.15s ease;">
+                        Lupa Password?
+                    </a>
                 </div>
 
                 <!-- Submit -->

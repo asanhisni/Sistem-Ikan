@@ -63,11 +63,13 @@ class UserController extends Controller
         $this->adminOnly();
 
         $request->validate([
-            'name'      => 'required|string|max:255',
-            'username'  => 'required|string|max:100|unique:users,username',
-            'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|string|min:6|confirmed',
-            'cabang_id' => [
+            'name'         => 'required|string|max:255',
+            'username'     => 'required|string|max:100|unique:users,username',
+            'email'        => 'required|email|unique:users,email',
+            'telepon'      => 'nullable|string|max:20',
+            'recovery_pin' => 'required|string|max:20',
+            'password'     => 'required|string|min:6|confirmed',
+            'cabang_id'    => [
                 'required',
                 'exists:cabang,id',
                 function ($attribute, $value, $fail) {
@@ -86,25 +88,28 @@ class UserController extends Controller
                 },
             ],
         ], [
-            'name.required'      => 'Nama wajib diisi.',
-            'username.required'  => 'Username wajib diisi.',
-            'username.unique'    => 'Username sudah digunakan.',
-            'email.required'     => 'Email wajib diisi.',
-            'email.unique'       => 'Email sudah terdaftar.',
-            'password.required'  => 'Password wajib diisi.',
-            'password.min'       => 'Password minimal 6 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'cabang_id.required' => 'Pilih cabang yang akan ditugaskan.',
-            'cabang_id.exists'   => 'Cabang tidak ditemukan.',
+            'name.required'         => 'Nama wajib diisi.',
+            'username.required'     => 'Username wajib diisi.',
+            'username.unique'       => 'Username sudah digunakan.',
+            'email.required'        => 'Email wajib diisi.',
+            'email.unique'          => 'Email sudah terdaftar.',
+            'recovery_pin.required' => 'PIN Pemulihan Akun wajib diisi.',
+            'password.required'     => 'Password wajib diisi.',
+            'password.min'          => 'Password minimal 6 karakter.',
+            'password.confirmed'    => 'Konfirmasi password tidak cocok.',
+            'cabang_id.required'    => 'Pilih cabang yang akan ditugaskan.',
+            'cabang_id.exists'      => 'Cabang tidak ditemukan.',
         ]);
 
         User::create([
-            'name'      => $request->name,
-            'username'  => $request->username,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'role'      => 'kepala_cabang',
-            'cabang_id' => $request->cabang_id,
+            'name'         => $request->name,
+            'username'     => $request->username,
+            'email'        => $request->email,
+            'telepon'      => $request->telepon,
+            'recovery_pin' => $request->recovery_pin,
+            'password'     => Hash::make($request->password),
+            'role'         => 'kepala_cabang',
+            'cabang_id'    => $request->cabang_id,
         ]);
 
         return redirect()->route('users.index')
@@ -145,10 +150,12 @@ class UserController extends Controller
         }
 
         $rules = [
-            'name'      => 'required|string|max:255',
-            'username'  => 'required|string|max:100|unique:users,username,' . $user->id,
-            'email'     => 'required|email|unique:users,email,' . $user->id,
-            'cabang_id' => [
+            'name'         => 'required|string|max:255',
+            'username'     => 'required|string|max:100|unique:users,username,' . $user->id,
+            'email'        => 'required|email|unique:users,email,' . $user->id,
+            'telepon'      => 'nullable|string|max:20',
+            'recovery_pin' => 'required|string|max:20',
+            'cabang_id'    => [
                 'required',
                 'exists:cabang,id',
                 function ($attribute, $value, $fail) use ($user) {
@@ -173,21 +180,24 @@ class UserController extends Controller
         }
 
         $request->validate($rules, [
-            'name.required'      => 'Nama wajib diisi.',
-            'username.required'  => 'Username wajib diisi.',
-            'username.unique'    => 'Username sudah digunakan.',
-            'email.required'     => 'Email wajib diisi.',
-            'email.unique'       => 'Email sudah terdaftar.',
-            'password.min'       => 'Password minimal 6 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'cabang_id.required' => 'Pilih cabang yang akan ditugaskan.',
+            'name.required'         => 'Nama wajib diisi.',
+            'username.required'     => 'Username wajib diisi.',
+            'username.unique'       => 'Username sudah digunakan.',
+            'email.required'        => 'Email wajib diisi.',
+            'email.unique'          => 'Email sudah terdaftar.',
+            'recovery_pin.required' => 'PIN Pemulihan Akun wajib diisi.',
+            'password.min'          => 'Password minimal 6 karakter.',
+            'password.confirmed'    => 'Konfirmasi password tidak cocok.',
+            'cabang_id.required'    => 'Pilih cabang yang akan ditugaskan.',
         ]);
 
         $data = [
-            'name'      => $request->name,
-            'username'  => $request->username,
-            'email'     => $request->email,
-            'cabang_id' => $request->cabang_id,
+            'name'         => $request->name,
+            'username'     => $request->username,
+            'email'        => $request->email,
+            'telepon'      => $request->telepon,
+            'recovery_pin' => $request->recovery_pin,
+            'cabang_id'    => $request->cabang_id,
         ];
 
         if ($request->filled('password')) {

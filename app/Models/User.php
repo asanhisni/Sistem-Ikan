@@ -21,7 +21,9 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'telepon',
         'password',
+        'recovery_pin',
         'role',
         'cabang_id',
     ];

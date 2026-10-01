@@ -397,6 +397,24 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telepon">No. WhatsApp / HP</label>
+                        <input type="text" class="form-control @error('telepon') is-invalid @enderror"
+                               id="telepon" name="telepon" value="{{ old('telepon', $user->telepon) }}"
+                               placeholder="Contoh: 08123456789">
+                        @error('telepon')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="recovery_pin">PIN Pemulihan Akun <span class="req">*</span></label>
+                        <input type="text" class="form-control @error('recovery_pin') is-invalid @enderror"
+                               id="recovery_pin" name="recovery_pin" value="{{ old('recovery_pin', $user->recovery_pin ?? '123456') }}"
+                               placeholder="Kode PIN darurat">
+                        <small style="font-size:11.5px;color:#64748b;margin-top:4px;display:block;">Digunakan saat lupa password akun.</small>
+                        @error('recovery_pin')<span class="invalid-feedback">{{ $message }}</span>@enderror
+                    </div>
+                </div>
+
                 <!-- 2. GANTI PASSWORD -->
                 <div class="form-section-title form-section-divider">
                     <i class="fas fa-lock"></i>

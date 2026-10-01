@@ -452,7 +452,8 @@
             margin-top: 2px;
         }
 
-        .user-dropdown-item {
+        .user-dropdown-item,
+        .user-dropdown-link {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -461,12 +462,38 @@
             border: none;
             background: none;
             border-radius: 10px;
-            color: #e53935;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             text-align: left;
+            text-decoration: none;
             transition: all 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .user-dropdown-link {
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .user-dropdown-link:hover {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .user-dropdown-link i {
+            color: #2563eb;
+            font-size: 14px;
+        }
+
+        .user-dropdown-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 4px 0;
+        }
+
+        .user-dropdown-item {
+            color: #e53935;
         }
 
         .user-dropdown-item:hover {
@@ -730,6 +757,13 @@
                         <div class="dropdown-name">{{ Auth::user()->name }}</div>
                         <div class="dropdown-role">{{ Auth::user()->role === 'admin' ? 'Administrator' : (Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? 'Kepala Cabang')) }}</div>
                     </div>
+
+                    <a href="{{ route('profile.show') }}" class="user-dropdown-link">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Detail Profil Saya</span>
+                    </a>
+
+                    <div class="user-dropdown-divider"></div>
 
                     <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                         @csrf
