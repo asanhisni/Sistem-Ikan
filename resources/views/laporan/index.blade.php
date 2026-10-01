@@ -11,53 +11,7 @@
         padding-bottom: 30px;
     }
 
-    /* ─── TAB NAVIGASI LAPORAN (PENJUALAN VS STOK) ─── */
-    .laporan-nav-tabs {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-        background: #eef2f6;
-        padding: 5px;
-        border-radius: 14px;
-        width: fit-content;
-    }
-
-    .laporan-tab-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 18px;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        color: #64748b;
-        transition: all 0.2s ease;
-    }
-
-    .laporan-tab-btn.active {
-        background: #ffffff;
-        color: #2563eb;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-    }
-
-    .laporan-tab-btn:hover:not(.active) {
-        color: #0f172a;
-    }
-
-    @media (max-width: 768px) {
-        .laporan-nav-tabs {
-            width: 100%;
-        }
-        .laporan-tab-btn {
-            flex: 1;
-            justify-content: center;
-            padding: 8px 10px;
-            font-size: 12px;
-        }
-    }
-
-    /* ─── FILTER PANEL (SAMA PERSIS DENGAN LAPORAN STOK IKAN) ─── */
+    /* ─── FILTER PANEL ─── */
     .filter-card {
         background: #ffffff;
         border-radius: 16px;
@@ -604,18 +558,6 @@
 
 @section('content')
 <div class="page-shell">
-
-    <!-- TAB SWITCHER LAPORAN -->
-    <div class="laporan-nav-tabs">
-        <a href="{{ route('laporan.index') }}" class="laporan-tab-btn active">
-            <i class="fas fa-chart-line"></i>
-            <span>Laporan Penjualan</span>
-        </a>
-        <a href="{{ route('laporan.stok') }}" class="laporan-tab-btn">
-            <i class="fas fa-boxes-stacked"></i>
-            <span>Laporan Stok Ikan</span>
-        </a>
-    </div>
 
     <!-- 1. PANEL FILTER (BULAN & CABANG) -->
     <div class="filter-card">

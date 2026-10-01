@@ -5,11 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') | Sistem Ikan</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/logo_ikan2.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <noscript>
+        <style>
+            .app-loader-overlay, .sidebar, .main-wrap, .bottom-nav { display: none !important; }
+            .noscript-warning-screen {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: #0d1b2a;
+                color: #ffffff;
+                z-index: 999999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+                text-align: center;
+                font-family: 'Inter', sans-serif;
+            }
+            .noscript-warning-box {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                padding: 36px 28px;
+                max-width: 480px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            }
+            .noscript-icon {
+                font-size: 50px;
+                color: #f59e0b;
+                margin-bottom: 16px;
+            }
+            .noscript-title {
+                font-size: 20px;
+                font-weight: 800;
+                margin-bottom: 10px;
+                color: #ffffff;
+            }
+            .noscript-text {
+                font-size: 14px;
+                color: #cbd5e1;
+                line-height: 1.6;
+            }
+        </style>
+    </noscript>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -78,12 +123,17 @@
         }
 
         .app-flip-logo-box {
-            width: 86px;
-            height: 86px;
+            width: 110px;
+            height: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
             perspective: 1000px;
+            background: #ffffff;
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 14px 35px rgba(2, 62, 138, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
         }
 
         .app-flip-logo-img {
@@ -91,7 +141,6 @@
             height: 100%;
             object-fit: contain;
             animation: appLogo3DFlip 1.8s ease-in-out infinite;
-            filter: drop-shadow(0 10px 20px rgba(2, 62, 138, 0.25));
         }
 
         @keyframes appLogo3DFlip {
@@ -136,45 +185,71 @@
         }
 
         .sidebar-brand {
-            padding: 24px 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 22px 14px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
         }
 
         .brand-top {
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 10px;
-            margin-bottom: 4px;
+            width: 100%;
         }
 
         .brand-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            width: 86px; 
+            height: 86px;
+            min-width: 86px; 
+            min-height: 86px;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             overflow: hidden;
-            background: rgba(255,255,255,0.06);
+            background: #ffffff;
+            padding: 6px;
+            border: 3px solid rgba(255,255,255,0.95);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.1);
             flex-shrink: 0;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .brand-icon:hover {
+            transform: scale(1.04);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.45);
         }
 
         .brand-icon img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         .brand-name {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 800;
             color: #fff;
-            letter-spacing: -0.3px;
+            letter-spacing: 0.3px;
+            text-align: center;
+            line-height: 1.25;
+            margin-top: 2px;
         }
 
         .brand-desc {
             font-size: 11px;
-            color: var(--sidebar-text);
-            line-height: 1.4;
-            padding-left: 46px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.35;
+            text-align: center;
+            padding: 0;
+            margin-top: 1px;
         }
 
         .sidebar-section-label {
@@ -560,11 +635,24 @@
     @stack('styles')
 </head>
 <body>
+<noscript>
+    <div class="noscript-warning-screen">
+        <div class="noscript-warning-box">
+            <div class="noscript-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="noscript-title">JavaScript Diperlukan</h2>
+            <p class="noscript-text">
+                Halaman ini membutuhkan JavaScript agar dapat berfungsi dengan baik dan aman. Silakan aktifkan JavaScript di pengaturan browser Anda untuk mengakses sistem.
+            </p>
+        </div>
+    </div>
+</noscript>
 
 <!-- GLOBAL LOADER INDIKATOR (Semua Halaman) -->
 <div class="app-loader-overlay" id="appGlobalLoader">
     <div class="app-flip-logo-box">
-        <img src="{{ asset('logo/logo_ikan.png') }}" alt="Loading..." class="app-flip-logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3050/3050247.png'">
+        <img src="{{ asset('logo/logo_ikan2.png') }}" alt="Loading..." class="app-flip-logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3050/3050247.png'">
     </div>
     <div class="app-loader-label">Memuat Sistem...</div>
 </div>
@@ -577,11 +665,11 @@
     <div class="sidebar-brand">
         <div class="brand-top">
             <div class="brand-icon">
-                <img src="{{ asset('logo/logo_ikan.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='🐟'">
+                <img src="{{ asset('logo/logo_ikan2.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='🐟'">
             </div>
-            <span class="brand-name">SAMI JAYA</span>
+            <div class="brand-name">PT. SAMI JAYA</div>
+            <div class="brand-desc">Sistem Pencatatan &amp; Monitoring</div>
         </div>
-        <div class="brand-desc">Sistem Pencatatan &amp; Monitoring Transaksi</div>
     </div>
 
     <div class="sidebar-section-label">Menu Utama</div>
@@ -751,6 +839,56 @@
     });
     document.addEventListener('gestureend', function(e) {
         e.preventDefault();
+    });
+
+    // ─── GLOBAL SWEETALERT CONFIRMATION UNTUK TOMBOL HAPUS ───
+    function confirmSwalDelete(form, customTitle, customText) {
+        Swal.fire({
+            title: customTitle || 'Apakah Anda yakin?',
+            text: customText || 'Data yang dihapus tidak dapat dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: '<i class="fas fa-trash"></i> Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'swal2-rounded-popup',
+                confirmButton: 'swal2-confirm-btn',
+                cancelButton: 'swal2-cancel-btn'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    // Tangkap form dengan data-confirm-delete otomatis
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form && form.matches('[data-confirm-delete]')) {
+            e.preventDefault();
+            const title = form.getAttribute('data-title') || 'Apakah Anda yakin?';
+            const text = form.getAttribute('data-text') || 'Data ini akan dihapus dari sistem!';
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-trash"></i> Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.removeAttribute('data-confirm-delete');
+                    form.submit();
+                }
+            });
+        }
     });
 </script>
 @stack('scripts')

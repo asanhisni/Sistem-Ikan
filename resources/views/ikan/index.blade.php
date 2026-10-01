@@ -306,14 +306,14 @@
                         </td>
                         <td>
                             <div class="stok-badge {{ $i->stok_kg <= 10 ? 'stok-rendah' : '' }}">
-                                {{ number_format($i->stok_kg, 1, ',', '') }} Kg
+                                {{ number_format($i->stok_kg, 1, ',', '') }}
                             </div>
                         </td>
                         <td>
                             <a href="{{ route('ikan.edit', $i->id) }}" class="btn-aksi btn-edit" title="Edit">
                                 <i class="fas fa-pen"></i>
                             </a>
-                            <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus ikan ini?');">
+                            <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" style="display:inline;" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Data Ikan?', 'Apakah Anda yakin ingin menghapus data ikan {{ addslashes($i->nama_ikan) }}?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-aksi btn-hapus" title="Hapus">
@@ -344,9 +344,6 @@
             <!-- Baris Atas: Nama Ikan (Kiri) & Badge Stok (Kanan) -->
             <div class="ikan-row-top">
                 <div class="ikan-nama-title">{{ $i->nama_ikan }}</div>
-                <div class="stok-badge {{ $i->stok_kg <= 10 ? 'stok-rendah' : '' }}">
-                    {{ number_format($i->stok_kg, 1, ',', '') }} Kg
-                </div>
             </div>
 
             <!-- Baris Bawah: Harga (Kiri) & Tombol Edit/Hapus (Kanan) -->
@@ -358,7 +355,7 @@
                     <a href="{{ route('ikan.edit', $i->id) }}" class="btn-aksi btn-edit" title="Edit">
                         <i class="fas fa-pen"></i>
                     </a>
-                    <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" onsubmit="return confirm('Hapus ikan ini?');" style="margin:0;">
+                    <form action="{{ route('ikan.destroy', $i->id) }}" method="POST" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Data Ikan?', 'Apakah Anda yakin ingin menghapus data ikan {{ addslashes($i->nama_ikan) }}?');" style="margin:0;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn-aksi btn-hapus" title="Hapus">

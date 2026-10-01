@@ -84,29 +84,17 @@ class IkanController extends Controller
     public function update(Request $request, Ikan $ikan)
     {
         $request->validate([
-            'nama_ikan' => 'required|string|max:255',
+            'nama_ikan'   => 'required|string|max:255',
             'harga_per_kg' => 'required|numeric|min:0',
-            'stok_kg' => 'required|numeric|min:0',
         ]);
 
-        $user = Auth::user();
-        if ($user && $user->role === 'kepala_cabang') {
-            $cabang = $user->cabangRelasi ? $user->cabangRelasi : Cabang::where('nama_cabang', $user->cabang ?? 'Cilawu')->first();
-            if ($cabang) {
-                StokCabang::updateOrCreate(
-                    ['cabang_id' => $cabang->id, 'ikan_id' => $ikan->id],
-                    ['stok_kg' => $request->stok_kg]
-                );
-            }
-            $ikan->update([
-                'nama_ikan' => $request->nama_ikan,
-                'harga_per_kg' => $request->harga_per_kg,
-            ]);
-        } else {
-            $ikan->update($request->all());
-        }
+        // Hanya update nama dan harga — stok dikelola otomatis oleh sistem transaksi
+        $ikan->update([
+            'nama_ikan'   => $request->nama_ikan,
+            'harga_per_kg' => $request->harga_per_kg,
+        ]);
 
-        return redirect()->route('ikan.index')->with('success', 'Data ikan & stok berhasil diubah!');
+        return redirect()->route('ikan.index')->with('success', 'Data ikan berhasil diubah!');
     }
 
     public function destroy(Ikan $ikan)

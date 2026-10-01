@@ -5,10 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Sistem Manajemen Ikan - Login">
     <title>Login | Sistem Ikan</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/logo_ikan2.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <noscript>
+        <style>
+            .login-wrapper, .bubbles { display: none !important; }
+            .noscript-warning-screen {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: #03045e;
+                color: #ffffff;
+                z-index: 999999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+                text-align: center;
+                font-family: 'Inter', sans-serif;
+            }
+            .noscript-warning-box {
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 20px;
+                padding: 36px 28px;
+                max-width: 480px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            }
+            .noscript-icon {
+                font-size: 50px;
+                color: #f59e0b;
+                margin-bottom: 16px;
+            }
+            .noscript-title {
+                font-size: 20px;
+                font-weight: 800;
+                margin-bottom: 10px;
+                color: #ffffff;
+            }
+            .noscript-text {
+                font-size: 14px;
+                color: #caf0f8;
+                line-height: 1.6;
+            }
+        </style>
+    </noscript>
     <style>
         *, *::before, *::after {
             margin: 0;
@@ -137,18 +181,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 86px;
-            height: 86px;
-            margin: 0 auto 12px;
-            background: transparent;
-            box-shadow: none;
-            border: none;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            padding: 8px;
+            border: 3px solid #e0f2fe;
+            box-shadow: 0 10px 25px rgba(0, 119, 182, 0.16), 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 14px 30px rgba(0, 119, 182, 0.22);
         }
 
         .logo-icon img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         .app-title {
@@ -331,6 +385,19 @@
     </style>
 </head>
 <body>
+<noscript>
+    <div class="noscript-warning-screen">
+        <div class="noscript-warning-box">
+            <div class="noscript-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 class="noscript-title">JavaScript Diperlukan</h2>
+            <p class="noscript-text">
+                Halaman login membutuhkan JavaScript agar dapat berfungsi dengan baik dan aman. Silakan aktifkan JavaScript di browser Anda untuk masuk ke sistem.
+            </p>
+        </div>
+    </div>
+</noscript>
 
     <!-- Background Bubbles -->
     <div class="bubbles">
@@ -349,7 +416,7 @@
             <!-- Logo & Title -->
             <div class="logo-area">
                 <div class="logo-icon">
-                    <img src="{{ asset('logo/logo_ikan.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-fish\' style=\'font-size:38px;color:#90e0ef;\'></i>'">
+                    <img src="{{ asset('logo/logo_ikan2.png') }}" alt="Logo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-fish\' style=\'font-size:38px;color:#90e0ef;\'></i>'">
                 </div>
                 <h1 class="app-title">PT. PELOPOR SAMI JAYA</h1>
                 <p class="app-subtitle">Sistem pencatatan &amp; Monitoring penjualan ikan</p>

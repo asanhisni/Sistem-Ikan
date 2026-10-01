@@ -88,6 +88,20 @@
         background: #1e293b;
     }
 
+    .date-filter-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .date-filter-group select {
+        padding: 12px 10px;
+    }
+
+    .date-filter-group #tanggalSelect { min-width: 110px; }
+    .date-filter-group #bulanSelect   { min-width: 135px; }
+    .date-filter-group #tahunSelect   { min-width: 110px; }
+
     .reset-link {
         color: #d93025;
         font-weight: 700;
@@ -566,6 +580,19 @@
         .search-form button {
             width: 100%;
         }
+        .date-filter-group {
+            display: grid;
+            grid-template-columns: 1fr 1.35fr 1fr;
+            gap: 6px;
+            width: 100%;
+        }
+        .date-filter-group select {
+            min-width: 0 !important;
+            font-size: 13px;
+            padding: 10px 4px;
+            min-height: 46px;
+            text-align: center;
+        }
         .table-card {
             display: none;
         }
@@ -603,13 +630,44 @@
 
         <form class="search-form" id="searchFilterForm" method="GET" action="{{ route('transaksi.index') }}">
             <input type="text" name="search" id="searchInput" placeholder="Cari nama atau no HP..." value="{{ $search ?? '' }}">
-            <select name="status" id="statusSelect">
+            
+            <select name="status" id="statusSelect" onchange="this.form.requestSubmit()">
                 <option value="">Semua Status</option>
                 <option value="lunas" {{ ($status ?? '') == 'lunas' ? 'selected' : '' }}>Lunas</option>
                 <option value="belum_lunas" {{ ($status ?? '') == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas (termasuk DP)</option>
             </select>
-            <button type="submit">CARI</button>
-            @if($search || $status)
+
+            <!-- Group Tanggal, Bulan, Tahun Sejajar -->
+            <div class="date-filter-group">
+                <!-- Filter Tanggal (1-31) -->
+                <select name="tanggal" id="tanggalSelect" onchange="this.form.requestSubmit()">
+                    <option value="">Tanggal</option>
+                    @for($d = 1; $d <= 31; $d++)
+                        @php $dVal = str_pad($d, 2, '0', STR_PAD_LEFT); @endphp
+                        <option value="{{ $dVal }}" {{ ($tanggal ?? '') == $dVal || ($tanggal ?? '') == $d ? 'selected' : '' }}>Tgl {{ $dVal }}</option>
+                    @endfor
+                </select>
+
+                <!-- Filter Bulan -->
+                <select name="bulan" id="bulanSelect" onchange="this.form.requestSubmit()">
+                    <option value="">Bulan</option>
+                    @foreach($months as $mNum => $mName)
+                        @php $mVal = str_pad($mNum, 2, '0', STR_PAD_LEFT); @endphp
+                        <option value="{{ $mVal }}" {{ ($bulan ?? '') == $mVal || ($bulan ?? '') == $mNum ? 'selected' : '' }}>{{ $mName }}</option>
+                    @endforeach
+                </select>
+
+                <!-- Filter Tahun -->
+                <select name="tahun" id="tahunSelect" onchange="this.form.requestSubmit()">
+                    <option value="">Tahun</option>
+                    @foreach($years as $y)
+                        <option value="{{ $y }}" {{ ($tahun ?? '') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <button type="submit"><i class="fas fa-search"></i> CARI</button>
+            @if($search || $status || $tanggal || $bulan || $tahun)
                 <a href="{{ route('transaksi.index') }}" class="reset-link" id="resetFilterBtn">Reset</a>
             @endif
         </form>
@@ -685,11 +743,13 @@
                             <td>
                                 <a href="{{ route('transaksi.show', $t->id) }}" class="btn-aksi" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                                 <a href="{{ route('transaksi.edit', $t->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
-                                <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
+                                @if(Auth::user()->role === 'admin')
+                                <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Transaksi?', 'Apakah Anda yakin ingin menghapus transaksi ini? Stok ikan akan dikembalikan.');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn-aksi btn-hapus" title="Hapus"><i class="fas fa-trash"></i></button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                         @empty
@@ -779,11 +839,13 @@
                     <div class="mobile-actions">
                         <a href="{{ route('transaksi.show', $t->id) }}" class="mobile-btn receipt" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                         <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                        <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');" style="margin: 0;">
+                        @if(Auth::user()->role === 'admin')
+                        <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Transaksi?', 'Apakah Anda yakin ingin menghapus transaksi ini? Stok ikan akan dikembalikan.');" style="margin: 0;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="mobile-btn delete" title="Hapus"><i class="fas fa-trash"></i></button>
                         </form>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -976,8 +1038,16 @@
         const resetLink = e.target.closest('#resetFilterBtn');
         if (resetLink) {
             e.preventDefault();
-            document.getElementById('searchInput').value = '';
-            document.getElementById('statusSelect').value = '';
+            const searchIn = document.getElementById('searchInput');
+            if (searchIn) searchIn.value = '';
+            const statusSel = document.getElementById('statusSelect');
+            if (statusSel) statusSel.value = '';
+            const tglSel = document.getElementById('tanggalSelect');
+            if (tglSel) tglSel.value = '';
+            const blnSel = document.getElementById('bulanSelect');
+            if (blnSel) blnSel.value = '';
+            const thnSel = document.getElementById('tahunSelect');
+            if (thnSel) thnSel.value = '';
             loadTransaksiData(resetLink.href);
         }
     });

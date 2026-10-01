@@ -246,7 +246,7 @@
                         </td>
                         <td>
                             <a href="{{ route('pelanggan.edit', $p->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
-                            <form action="{{ route('pelanggan.destroy', $p->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus pelanggan ini?');">
+                            <form action="{{ route('pelanggan.destroy', $p->id) }}" method="POST" style="display:inline;" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Data Pelanggan?', 'Apakah Anda yakin ingin menghapus pelanggan {{ addslashes($p->nama) }}?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-aksi btn-hapus" title="Hapus"><i class="fas fa-trash"></i></button>
@@ -280,7 +280,7 @@
             </div>
             <div class="mobile-actions">
                 <a href="{{ route('pelanggan.edit', $p->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                <form action="{{ route('pelanggan.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus pelanggan ini?');">
+                <form action="{{ route('pelanggan.destroy', $p->id) }}" method="POST" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Data Pelanggan?', 'Apakah Anda yakin ingin menghapus pelanggan {{ addslashes($p->nama) }}?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="mobile-btn delete" title="Hapus"><i class="fas fa-trash"></i></button>

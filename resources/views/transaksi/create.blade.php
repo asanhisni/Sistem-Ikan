@@ -658,29 +658,48 @@
     </form>
 </div>
 
-<!-- Modal Prompt Volume (Kg) -->
+<!-- Modal Prompt Volume (Kg) & Harga Satuan -->
 <div class="prompt-modal-overlay" id="promptVolumeModal">
     <div class="prompt-modal-card">
         <div class="prompt-modal-header">
             <div class="prompt-modal-icon">
-                <i class="fas fa-weight-hanging"></i>
+                <i class="fas fa-fish"></i>
             </div>
             <div>
                 <div class="prompt-modal-title" id="promptNamaIkan">Nama Ikan</div>
-                <div class="prompt-modal-subtitle" id="promptHargaIkan">Rp 0 / Kg</div>
+                <div class="prompt-modal-subtitle" id="promptHargaIkanNormal">Harga Normal: Rp 0 / Kg</div>
             </div>
         </div>
         
-        <div class="form-group" style="margin-bottom: 0;">
-            <label style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Berapa Kg yang dibeli?</label>
-            <input type="number" step="0.1" min="0.1" id="promptJumlahKg" class="form-control" placeholder="Contoh: 10 atau 12.5" onkeydown="if(event.key==='Enter'){ event.preventDefault(); confirmAddIkan(); }">
+        <!-- Input 1: Harga per Kg (Bisa Diketik Manual untuk Nawar) -->
+        <div class="form-group" style="margin-bottom: 14px;">
+            <label style="font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fas fa-tag" style="color: #1e88e5; margin-right: 4px;"></i> Harga per Kg (Rp)</span>
+                <span id="btnResetHargaNormal" style="font-size: 11px; color: #1e88e5; font-weight: 700; cursor: pointer; text-decoration: underline;" onclick="resetToNormalPrice()">Pakai Harga Normal</span>
+            </label>
+            <input type="text" id="promptDisplayHarga" class="form-control" placeholder="Contoh: 35.000" oninput="formatRupiahPromptHarga(this)" style="font-size: 16px; font-weight: 800; color: #1e88e5;">
+            <input type="hidden" id="promptRealHarga" value="">
+        </div>
+
+        <!-- Input 2: Jumlah Kg -->
+        <div class="form-group" style="margin-bottom: 12px;">
+            <label style="font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 5px; display: block;">
+                <i class="fas fa-weight-hanging" style="color: #1e88e5; margin-right: 4px;"></i> Jumlah Kilogram (Kg)
+            </label>
+            <input type="number" step="0.1" min="0.1" id="promptJumlahKg" class="form-control" placeholder="Contoh: 10 atau 12.5" oninput="updatePromptSubtotalPreview()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); confirmAddIkan(); }">
             <div id="promptErrorMsg" class="error-msg" style="display: none;">Masukkan angka Kg yang valid (min. 0.1 Kg).</div>
+        </div>
+
+        <!-- Live Estimasi Subtotal -->
+        <div id="promptSubtotalBox" style="background: #f0fdf4; border: 1.5px dashed #86efac; border-radius: 12px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 700; color: #166534;">Estimasi Subtotal:</span>
+            <span id="promptSubtotalText" style="font-size: 15px; font-weight: 800; color: #15803d;">Rp 0</span>
         </div>
 
         <div class="prompt-modal-actions">
             <button type="button" class="btn-prompt-cancel" onclick="closePromptModal()">Batal</button>
             <button type="button" class="btn-prompt-submit" onclick="confirmAddIkan()">
-                <i class="fas fa-plus"></i> Tambah
+                <i class="fas fa-plus"></i> Tambah ke Pesanan
             </button>
         </div>
     </div>
@@ -784,19 +803,57 @@
     let selectedItems = [];
     let pendingIkan = null;
 
-    function openVolumePrompt(id, nama, harga) {
-        pendingIkan = { id, nama, harga: parseFloat(harga) || 0 };
+    function openVolumePrompt(id, nama, hargaNormal) {
+        pendingIkan = { 
+            id: id, 
+            nama: nama, 
+            hargaNormal: parseFloat(hargaNormal) || 0,
+            hargaCustom: parseFloat(hargaNormal) || 0
+        };
 
         document.getElementById('promptNamaIkan').textContent = pendingIkan.nama;
-        document.getElementById('promptHargaIkan').textContent = 'Rp ' + Number(pendingIkan.harga).toLocaleString('id-ID') + ' / Kg';
+        document.getElementById('promptHargaIkanNormal').textContent = 'Harga Normal: Rp ' + Number(pendingIkan.hargaNormal).toLocaleString('id-ID') + ' / Kg';
+        
+        // Set default harga ke harga normal
+        document.getElementById('promptRealHarga').value = pendingIkan.hargaNormal;
+        document.getElementById('promptDisplayHarga').value = Number(pendingIkan.hargaNormal).toLocaleString('id-ID');
+        
         document.getElementById('promptJumlahKg').value = '';
         document.getElementById('promptErrorMsg').style.display = 'none';
-        
+        updatePromptSubtotalPreview();
+
         const modal = document.getElementById('promptVolumeModal');
         modal.classList.add('show');
         setTimeout(() => {
             document.getElementById('promptJumlahKg').focus();
         }, 100);
+    }
+
+    function resetToNormalPrice() {
+        if (!pendingIkan) return;
+        document.getElementById('promptRealHarga').value = pendingIkan.hargaNormal;
+        document.getElementById('promptDisplayHarga').value = Number(pendingIkan.hargaNormal).toLocaleString('id-ID');
+        updatePromptSubtotalPreview();
+    }
+
+    function formatRupiahPromptHarga(inputEl) {
+        let val = inputEl.value.replace(/\D/g, '');
+        let realInput = document.getElementById('promptRealHarga');
+        if (!val) {
+            realInput.value = '0';
+            inputEl.value = '';
+        } else {
+            realInput.value = val;
+            inputEl.value = Number(val).toLocaleString('id-ID');
+        }
+        updatePromptSubtotalPreview();
+    }
+
+    function updatePromptSubtotalPreview() {
+        const harga = parseFloat(document.getElementById('promptRealHarga').value) || 0;
+        const kg = parseFloat(document.getElementById('promptJumlahKg').value) || 0;
+        const subtotal = harga * kg;
+        document.getElementById('promptSubtotalText').textContent = 'Rp ' + Number(subtotal).toLocaleString('id-ID');
     }
 
     function closePromptModal() {
@@ -807,6 +864,7 @@
     function confirmAddIkan() {
         const kgInput = document.getElementById('promptJumlahKg');
         const kg = parseFloat(kgInput.value);
+        const hargaVal = parseFloat(document.getElementById('promptRealHarga').value);
 
         if (!kg || kg <= 0) {
             document.getElementById('promptErrorMsg').style.display = 'block';
@@ -814,14 +872,18 @@
             return;
         }
 
-        const existingIndex = selectedItems.findIndex(i => String(i.id) === String(pendingIkan.id));
+        const hargaPerKg = (!isNaN(hargaVal) && hargaVal >= 0) ? hargaVal : pendingIkan.hargaNormal;
+
+        // Cek apakah item dengan ID dan HARGA yang sama sudah ada di list
+        const existingIndex = selectedItems.findIndex(i => String(i.id) === String(pendingIkan.id) && Number(i.harga) === Number(hargaPerKg));
         if (existingIndex > -1) {
-            selectedItems[existingIndex].kg += kg;
+            selectedItems[existingIndex].kg = parseFloat((selectedItems[existingIndex].kg + kg).toFixed(2));
         } else {
             selectedItems.push({
                 id: pendingIkan.id,
                 nama: pendingIkan.nama,
-                harga: pendingIkan.harga,
+                harga: hargaPerKg,
+                hargaNormal: pendingIkan.hargaNormal,
                 kg: kg
             });
         }
@@ -873,12 +935,17 @@
         let html = '';
         selectedItems.forEach((item, idx) => {
             const subtotal = item.harga * item.kg;
+            const isCustomPrice = item.hargaNormal && Number(item.harga) !== Number(item.hargaNormal);
+
             html += `
                 <div class="item-card">
                     <div class="item-card-top">
                         <div>
                             <div class="item-card-title">${item.nama}</div>
-                            <div style="font-size: 12px; color: #64748b;">Rp ${Number(item.harga).toLocaleString('id-ID')} / Kg</div>
+                            <div style="font-size: 13px; color: #1e88e5; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                <span>Rp ${Number(item.harga).toLocaleString('id-ID')} / Kg</span>
+                                ${isCustomPrice ? `<span style="font-size: 10px; background: #fef3c7; color: #b45309; padding: 1px 6px; border-radius: 4px; font-weight: 700;">(Harga Khusus)</span>` : ''}
+                            </div>
                         </div>
                         <div class="item-card-subtotal" id="subtotal-${idx}">
                             Rp ${Number(subtotal).toLocaleString('id-ID')}
@@ -893,6 +960,7 @@
                             <span class="qty-unit">Kg</span>
                         </div>
                         <input type="hidden" name="items[${idx}][ikan_id]" value="${item.id}">
+                        <input type="hidden" name="items[${idx}][harga_per_kg]" value="${item.harga}">
                         <button type="button" class="btn-item-delete" onclick="removeIkanItem(${idx})" title="Hapus">
                             <i class="fas fa-trash-alt"></i>
                         </button>

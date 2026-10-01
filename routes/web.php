@@ -30,9 +30,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::resource('transaksi', TransaksiController::class);
+    Route::post('/transaksi/{transaksi}/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
+    Route::delete('/pembayaran/{pembayaran}', [TransaksiController::class, 'hapusPembayaran'])->name('pembayaran.destroy');
     Route::resource('pelanggan', PelangganController::class);
     Route::resource('ikan', IkanController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/stok', [LaporanController::class, 'stok'])->name('laporan.stok');
     Route::resource('users', UserController::class);
 });

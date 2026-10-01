@@ -14,6 +14,7 @@ class TransaksiDetail extends Model
         'jumlah_kg',
         'harga_per_kg',
         'subtotal',
+        'created_at',
     ];
 
     public function transaksi()

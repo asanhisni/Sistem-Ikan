@@ -86,10 +86,8 @@
             <input type="number" name="harga_per_kg" class="form-control" value="{{ old('harga_per_kg', (int)$ikan->harga_per_kg) }}" required>
         </div>
         
-        <div class="form-group">
-            <label>3. Sisa Stok (Kg)</label>
-            <input type="number" step="0.1" name="stok_kg" class="form-control" value="{{ old('stok_kg', (float)$ikan->stok_kg) }}" required>
-        </div>
+
+
         
         <button type="submit" class="btn-simpan"><i class="fas fa-save"></i> SIMPAN PERUBAHAN</button>
         <a href="{{ route('ikan.index') }}" class="btn-batal">BATAL</a>
