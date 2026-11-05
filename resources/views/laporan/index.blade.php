@@ -23,7 +23,7 @@
 
     .filter-form {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
     }
 
@@ -91,7 +91,7 @@
         color: #2563eb;
     }
 
-    @media (max-width: 560px) {
+    @media (max-width: 768px) {
         .filter-form {
             grid-template-columns: 1fr;
             gap: 10px;
@@ -559,7 +559,7 @@
 @section('content')
 <div class="page-shell">
 
-    <!-- 1. PANEL FILTER (BULAN & CABANG) -->
+    <!-- 1. PANEL FILTER (BULAN, CABANG & STATUS PEMBAYARAN) -->
     <div class="filter-card">
         <form method="GET" action="{{ route('laporan.index') }}" class="filter-form" id="laporanFilterForm">
             <!-- Filter Bulan -->
@@ -606,6 +606,20 @@
                 <input type="hidden" name="cabang" value="{{ Auth::user()->cabangRelasi ? Auth::user()->cabangRelasi->nama_cabang : (Auth::user()->cabang ?? $cabang) }}">
             </div>
             @endif
+
+            <!-- Filter Status Pembayaran (Lunas, DP, Belum Lunas) -->
+            <div class="filter-item">
+                <label for="filterStatus">
+                    <i class="fas fa-filter"></i>
+                    <span>Status Pembayaran</span>
+                </label>
+                <select name="status" id="filterStatus" class="filter-select">
+                    <option value="semua" {{ ($status ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua Status Pelanggan</option>
+                    <option value="lunas" {{ ($status ?? '') === 'lunas' ? 'selected' : '' }}>🟢 Lunas</option>
+                    <option value="dp" {{ ($status ?? '') === 'dp' ? 'selected' : '' }}>🟡 DP (Uang Muka)</option>
+                    <option value="belum" {{ ($status ?? '') === 'belum' || ($status ?? '') === 'belum_lunas' ? 'selected' : '' }}>🔴 Belum Lunas</option>
+                </select>
+            </div>
         </form>
     </div>
 
@@ -660,6 +674,9 @@
                     </div>
                     <div class="revenue-panel-sub">
                         Periode {{ Carbon\Carbon::parse($bulan)->isoFormat('MMMM YYYY') }} &bull; Cabang: <strong>{{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }}</strong>
+                        @if(($status ?? 'semua') !== 'semua')
+                            &bull; Status: <strong>{{ strtoupper($status == 'belum' ? 'Belum Lunas' : $status) }}</strong>
+                        @endif
                     </div>
                 </div>
                 <div class="revenue-badge-total">
@@ -679,7 +696,7 @@
                     <span class="section-title-icon">
                         <i class="fas fa-list-alt"></i>
                     </span>
-                    <span>Rincian Transaksi ({{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }})</span>
+                    <span>Rincian Transaksi ({{ $cabang === 'semua' ? 'Semua Cabang' : $cabang }} &bull; {{ ($status ?? 'semua') === 'semua' ? 'Semua Status' : strtoupper($status == 'belum' ? 'Belum Lunas' : $status) }})</span>
                 </div>
             </div>
 
@@ -1062,6 +1079,11 @@
     const filterCabang = document.getElementById('filterCabang');
     if (filterCabang) {
         filterCabang.addEventListener('change', executeLaporanFilter);
+    }
+
+    const filterStatus = document.getElementById('filterStatus');
+    if (filterStatus) {
+        filterStatus.addEventListener('change', executeLaporanFilter);
     }
 
     // Support browser Back/Forward navigation

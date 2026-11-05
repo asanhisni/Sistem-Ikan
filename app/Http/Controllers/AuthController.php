@@ -55,8 +55,135 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Restore sesi impersonasi dari database (agar tombol 'Kembali ke Admin'
+        // tetap muncul meski session sebelumnya sudah habis/logout)
+        $loggedUser = Auth::user();
+        if ($loggedUser && $loggedUser->impersonated_by_admin_id) {
+            $request->session()->put('impersonator_admin_id', $loggedUser->impersonated_by_admin_id);
+        }
+
         return redirect()->route('dashboard')
             ->with('success', 'Selamat datang, ' . Auth::user()->name . '!');
+    }
+
+    /**
+     * Beralih (Impersonate) langsung menjadi Kepala Cabang Suci.
+     */
+    public function switchCabangSuci(Request $request)
+    {
+        try {
+            $currentUser = Auth::user();
+            if (!$currentUser || $currentUser->role !== 'admin') {
+                return redirect()->route('dashboard')->with('error', 'Hanya Admin yang dapat beralih akun.');
+            }
+
+            // Simpan id admin asli SEBELUM session diubah
+            $adminId = $currentUser->id;
+
+            // Cari atau buat Cabang Suci
+            $suciCabang = \App\Models\Cabang::firstOrCreate(
+                ['nama_cabang' => 'Suci'],
+                [
+                    'kode_cabang'     => 'SCI-01',
+                    'lokasi'          => 'Jl. Suci',
+                    'admin_merangkap' => false,
+                ]
+            );
+
+            // Cari akun Kepala Cabang Suci
+            $suciUser = User::where('username', 'kcsuci')
+                ->orWhere(function ($q) use ($suciCabang) {
+                    $q->where('cabang_id', $suciCabang->id)->where('role', 'kepala_cabang');
+                })
+                ->first();
+
+            // Jika belum ada di database, buat akunnya
+            if (!$suciUser) {
+                $suciUser = User::create([
+                    'name'         => 'Kepala Cabang Suci',
+                    'username'     => 'kcsuci',
+                    'email'        => 'kcsuci@sistemikan.com',
+                    'password'     => Hash::make('suci123'),
+                    'role'         => 'kepala_cabang',
+                    'cabang_id'    => $suciCabang->id,
+                    'recovery_pin' => '123456',
+                ]);
+            } else {
+                if ($suciUser->role !== 'kepala_cabang' || $suciUser->cabang_id !== $suciCabang->id) {
+                    $suciUser->update([
+                        'role'      => 'kepala_cabang',
+                        'cabang_id' => $suciCabang->id,
+                    ]);
+                }
+            }
+
+            $suciUserName = $suciUser->name;
+
+            // Simpan flag impersonasi di DB akun Suci
+            try {
+                $suciUser->impersonated_by_admin_id = $adminId;
+                $suciUser->save();
+            } catch (\Throwable $th) {
+                \Log::warning('Gagal menyimpan impersonated_by_admin_id ke DB: ' . $th->getMessage());
+            }
+
+            // Login sebagai Kepala Cabang Suci
+            Auth::loginUsingId($suciUser->id, true);
+
+            // Simpan id admin asli di session
+            $request->session()->put('impersonator_admin_id', $adminId);
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Berhasil beralih menjadi Kepala Cabang Suci (' . $suciUserName . ').');
+        } catch (\Throwable $e) {
+            \Log::error('Error switchCabangSuci: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return redirect()->route('dashboard')
+                ->with('error', 'Gagal beralih ke Cabang Suci: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Kembali ke akun Admin Utama.
+     */
+    public function switchBackAdmin(Request $request)
+    {
+        try {
+            $currentUser = Auth::user();
+            $adminId = $request->session()->get('impersonator_admin_id') 
+                ?? ($currentUser ? $currentUser->impersonated_by_admin_id : null);
+
+            if (!$adminId) {
+                return redirect()->route('dashboard')->with('error', 'Sesi admin tidak ditemukan.');
+            }
+
+            $adminUser = User::find($adminId);
+            if (!$adminUser || $adminUser->role !== 'admin') {
+                return redirect()->route('dashboard')->with('error', 'Akun Admin tidak valid.');
+            }
+
+            // Hapus flag impersonasi dari database (di akun Suci yang sedang aktif)
+            if ($currentUser) {
+                try {
+                    $currentUser->impersonated_by_admin_id = null;
+                    $currentUser->save();
+                } catch (\Throwable $th) {
+                    \Log::warning('Gagal menghapus impersonated_by_admin_id di DB: ' . $th->getMessage());
+                }
+            }
+
+            // Login kembali sebagai admin
+            Auth::loginUsingId($adminUser->id, true);
+
+            // Hapus flag impersonasi dari session
+            $request->session()->forget('impersonator_admin_id');
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Kembali ke mode Administrator Utama.');
+        } catch (\Throwable $e) {
+            \Log::error('Error switchBackAdmin: ' . $e->getMessage());
+            return redirect()->route('dashboard')
+                ->with('error', 'Gagal kembali ke Admin: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -64,6 +191,10 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // Sengaja TIDAK menghapus impersonated_by_admin_id dari database saat logout,
+        // agar saat login ulang (via remember token / manual), sesi impersonasi
+        // dapat dipulihkan otomatis dan tombol "Kembali ke Admin" tetap muncul.
+        // Flag DB akan dihapus hanya saat switchBackAdmin() dipanggil.
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -25,15 +25,18 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // Kepala Cabang
+        // Kepala Cabang Suci
+        $suci = \App\Models\Cabang::where('nama_cabang', 'Suci')->first();
         User::updateOrCreate(
-            ['username' => 'kepalacabang'],
+            ['username' => 'kcsuci'],
             [
-                'name'     => 'Kepala Cabang',
-                'username' => 'kepalacabang',
-                'email'    => 'kepalacabang@sistemikan.com',
-                'password' => Hash::make('cabang123'),
-                'role'     => 'kepala_cabang',
+                'name'         => 'Kepala Cabang Suci',
+                'username'     => 'kcsuci',
+                'email'        => 'kcsuci@sistemikan.com',
+                'password'     => Hash::make('suci123'),
+                'role'         => 'kepala_cabang',
+                'cabang_id'    => $suci ? $suci->id : null,
+                'recovery_pin' => '123456',
             ]
         );
     }

@@ -596,9 +596,11 @@
         <button type="button" class="btn-action-small" onclick="window.print()">
             <i class="fas fa-print"></i> Cetak
         </button>
+        @if(Auth::user()->role !== 'admin')
         <a href="{{ route('transaksi.create') }}" class="btn-action-small" style="background: #e0f2fe; color: #0284c7; border-color: #bae6fd;">
             <i class="fas fa-plus"></i> Transaksi Baru
         </a>
+        @endif
         <a href="{{ route('transaksi.index') }}" class="btn-action-small">
             <i class="fas fa-list"></i> Daftar
         </a>

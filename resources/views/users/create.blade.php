@@ -268,17 +268,27 @@
                 </div>
 
                 <!-- Penempatan Cabang -->
-                <div class="form-section-title" style="margin-top:8px;">Penempatan Cabang</div>
+                <div class="form-section-title" style="margin-top:8px; display:flex; align-items:center; justify-content:space-between;">
+                    <span>Penempatan Cabang</span>
+                    <button type="button" class="btn-quick-branch" onclick="openModalCabang()" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                        <i class="fas fa-plus-circle"></i> Buat Cabang Baru
+                    </button>
+                </div>
 
                 @if($cabangTersedia->isEmpty())
-                    <div class="no-cabang-box">
+                    <div class="no-cabang-box" id="emptyCabangBox">
                         <i class="fas fa-exclamation-triangle"></i>
-                        Semua cabang sudah memiliki kepala cabang.<br>
-                        <small style="font-weight:400;opacity:0.8;">Tambahkan cabang baru atau hapus kepala cabang yang ada untuk mengosongkan slot.</small>
+                        Semua cabang saat ini sudah memiliki kepala cabang.<br>
+                        <small style="font-weight:400;opacity:0.8;display:block;margin:6px 0 10px;">Ingin membuka cabang baru? Buat cabang sekarang secara instan.</small>
+                        <button type="button" onclick="openModalCabang()" style="background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+                            <i class="fas fa-plus"></i> Buat Cabang Baru Sekarang
+                        </button>
                     </div>
                 @else
                     <div class="form-group">
-                        <label for="cabang_id">Pilih Cabang <span class="req">*</span></label>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                            <label for="cabang_id" style="margin:0;">Pilih Cabang <span class="req">*</span></label>
+                        </div>
                         <select class="form-control @error('cabang_id') is-invalid @enderror"
                                 id="cabang_id" name="cabang_id" onchange="showCabangInfo()">
                             <option value="">-- Pilih Cabang --</option>
@@ -314,10 +324,47 @@
         </form>
     </div>
 </div>
+
+<!-- ════ MODAL TAMBAH CABANG BARU ════ -->
+<div id="modalTambahCabang" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+    <div style="background:#fff; border-radius:20px; width:90%; max-width:440px; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25); animation:modalSlideUp 0.2s ease;">
+        <div style="padding:18px 24px; background:linear-gradient(135deg, #1e40af, #2563eb); color:#fff; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-weight:800; font-size:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-store"></i> Tambah Cabang Baru
+            </div>
+            <button type="button" onclick="closeModalCabang()" style="background:none; border:none; color:rgba(255,255,255,0.8); font-size:18px; cursor:pointer;">&times;</button>
+        </div>
+        <form action="{{ route('cabang.store') }}" method="POST" style="padding:22px;">
+            @csrf
+            <div class="form-group" style="margin-bottom:14px;">
+                <label for="nama_cabang_modal" style="display:block; font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;">Nama Cabang <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="nama_cabang" id="nama_cabang_modal" class="form-control" placeholder="Contoh: Tarogong, Garut Kota, dll." required>
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+                <label for="lokasi_modal" style="display:block; font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;">Lokasi / Alamat Cabang</label>
+                <input type="text" name="lokasi" id="lokasi_modal" class="form-control" placeholder="Contoh: Jl. Raya Tarogong No. 12">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button type="button" onclick="closeModalCabang()" style="background:#f1f5f9; color:#475569; border:none; padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer;">Batal</button>
+                <button type="submit" style="background:#2563eb; color:#fff; border:none; padding:10px 20px; border-radius:10px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,0.25);">Simpan Cabang</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
+function openModalCabang() {
+    const modal = document.getElementById('modalTambahCabang');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalCabang() {
+    const modal = document.getElementById('modalTambahCabang');
+    if (modal) modal.style.display = 'none';
+}
+
 function togglePwd(fieldId, iconId) {
     const field = document.getElementById(fieldId);
     const icon  = document.getElementById(iconId);
@@ -334,13 +381,14 @@ function showCabangInfo() {
     const select = document.getElementById('cabang_id');
     const infoBox = document.getElementById('cabangInfoBox');
     const infoText = document.getElementById('cabangInfoText');
+    if (!select) return;
     const option = select.options[select.selectedIndex];
     if (option && option.value) {
         const lokasi = option.getAttribute('data-lokasi');
         const kode   = option.getAttribute('data-kode');
         infoText.textContent = `Kode: ${kode} · Lokasi: ${lokasi || 'Belum diatur'}`;
         infoBox.style.display = 'block';
-    } else {
+    } else if (infoBox) {
         infoBox.style.display = 'none';
     }
 }

@@ -194,10 +194,11 @@
         }
     }
 
-    /* ─── 3 TOMBOL PINTASAN (SEIMBANG & RAPI) ─── */
+    /* ─── 2 TOMBOL PINTASAN (SEIMBANG & RAPI) ─── */
+    /* ─── TOMBOL PINTASAN (SEIMBANG & RAPI) ─── */
     .quick-actions-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 10px;
         margin-bottom: 14px;
     }
@@ -333,25 +334,38 @@
         </div>
     </div>
 
-    <!-- 3. TIGA TOMBOL PINTASAN (SEIMBANG & RAPI) -->
+    <!-- TOMBOL PINTASAN -->
     <div class="quick-actions-grid">
-        <a href="{{ route('transaksi.create') }}" class="quick-btn">
-            <div class="quick-btn-icon blue">
+        @if(Auth::user()->role !== 'admin')
+        <a href="{{ route('transaksi.create') }}" class="quick-btn" style="border-color: #bfdbfe; background: linear-gradient(135deg, #ffffff, #eff6ff);">
+            <div class="quick-btn-icon blue" style="background: #2563eb; color: #ffffff; box-shadow: 0 4px 12px rgba(37,99,235,0.28);">
                 <i class="fas fa-plus"></i>
             </div>
-            <span>Buat Transaksi Baru</span>
+            <div>
+                <div style="font-weight: 800; color: #1e40af;">Buat Transaksi Baru</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 500;">Input pesanan & otomatis potong stok</div>
+            </div>
         </a>
+        @endif
+
         <a href="{{ route('transaksi.index') }}" class="quick-btn">
             <div class="quick-btn-icon sky">
                 <i class="fas fa-receipt"></i>
             </div>
-            <span>Daftar Transaksi</span>
+            <div>
+                <div style="font-weight: 700;">Daftar Transaksi</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 500;">Lihat & kelola riwayat pesanan</div>
+            </div>
         </a>
+
         <a href="{{ route('laporan.index') }}" class="quick-btn">
             <div class="quick-btn-icon green">
                 <i class="fas fa-chart-bar"></i>
             </div>
-            <span>Lihat Laporan & Grafik</span>
+            <div>
+                <div style="font-weight: 700;">Laporan & Grafik</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 500;">Statistik penjualan & pendapatan</div>
+            </div>
         </a>
     </div>
 

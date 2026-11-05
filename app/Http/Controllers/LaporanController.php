@@ -13,6 +13,7 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $bulan  = $request->get('bulan', date('Y-m'));
+        $status = $request->get('status', 'semua');
         $user   = Auth::user();
 
         if ($user && $user->role === 'kepala_cabang') {
@@ -33,7 +34,8 @@ class LaporanController extends Controller
                 ELSE 4 
             END ASC")
             ->orderBy('tanggal_transaksi', 'desc');
-            
+
+        // Filter Cabang
         if ($cabang !== 'semua') {
             $selectedCabang = Cabang::where('nama_cabang', $cabang)->first();
             if ($selectedCabang) {
@@ -43,6 +45,20 @@ class LaporanController extends Controller
                 });
             } else {
                 $query->where('cabang', $cabang);
+            }
+        }
+
+        // Filter Status Pembayaran Pelanggan (Lunas, DP, Belum)
+        if ($status !== 'semua') {
+            if ($status === 'lunas') {
+                $query->where('status', 'lunas');
+            } elseif ($status === 'dp') {
+                $query->where('status', 'dp');
+            } elseif ($status === 'belum' || $status === 'belum_lunas') {
+                $query->where(function($q) {
+                    $q->where('status', 'belum')
+                      ->orWhere('status', 'belum_lunas');
+                });
             }
         }
 
@@ -91,6 +107,7 @@ class LaporanController extends Controller
             'transaksi',
             'bulan',
             'cabang',
+            'status',
             'totalPendapatan',
             'totalPiutang',
             'totalKg',

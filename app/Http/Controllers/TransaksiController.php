@@ -19,6 +19,7 @@ class TransaksiController extends Controller
         $tanggal = $request->get('tanggal');
         $bulan = $request->get('bulan');
         $tahun = $request->get('tahun');
+        $cabang = $request->get('cabang');
 
         $user = Auth::user();
         $query = Transaksi::with(['pelanggan', 'ikan', 'cabangRelasi', 'details.ikan'])
@@ -36,6 +37,16 @@ class TransaksiController extends Controller
                 $query->where('cabang_id', $user->cabang_id);
             } elseif ($user->cabang) {
                 $query->where('cabang', $user->cabang);
+            }
+        } elseif ($cabang && $cabang !== 'semua') {
+            $selectedCabang = \App\Models\Cabang::where('nama_cabang', $cabang)->first();
+            if ($selectedCabang) {
+                $query->where(function($q) use ($selectedCabang, $cabang) {
+                    $q->where('cabang_id', $selectedCabang->id)
+                      ->orWhere('cabang', $cabang);
+                });
+            } else {
+                $query->where('cabang', $cabang);
             }
         }
 
@@ -102,12 +113,15 @@ class TransaksiController extends Controller
             rsort($years);
         }
 
-        return view('transaksi.index', compact('transaksi', 'search', 'status', 'tanggal', 'bulan', 'tahun', 'months', 'years'));
+        return view('transaksi.index', compact('transaksi', 'search', 'status', 'tanggal', 'bulan', 'tahun', 'months', 'years', 'cabang'));
     }
 
 
     public function create()
     {
+        if (auth()->user()->role === 'admin') {
+            abort(403, 'Admin hanya berperan sebagai monitoring. Transaksi hanya dapat dibuat oleh Kepala Cabang.');
+        }
         $ikan = Ikan::all();
         $pelanggan = Pelanggan::all();
         return view('transaksi.create', compact('ikan', 'pelanggan'));
@@ -115,6 +129,9 @@ class TransaksiController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->role === 'admin') {
+            abort(403, 'Admin hanya berperan sebagai monitoring. Transaksi hanya dapat dibuat oleh Kepala Cabang.');
+        }
         $request->validate([
             'pembeli_nama' => 'required|string|max:255',
             'items' => 'required|array|min:1',
@@ -437,10 +454,6 @@ class TransaksiController extends Controller
 
     public function destroy(Transaksi $transaksi)
     {
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('transaksi.index')->with('error', 'Hanya administrator yang memiliki hak akses untuk menghapus transaksi.');
-        }
-
         DB::transaction(function () use ($transaksi) {
             // ─── KEMBALIKAN STOK JIKA TRANSAKSI DIHAPUS ───
             if ($transaksi->details && $transaksi->details->count() > 0) {

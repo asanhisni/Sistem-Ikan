@@ -393,6 +393,15 @@
             font-size: 15px; color: #fff; font-weight: 700;
             box-shadow: 0 4px 12px rgba(30,136,229,0.25);
             transition: transform 0.15s ease;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .user-info:hover .avatar {
@@ -730,6 +739,28 @@
             <i class="fas fa-chart-bar"></i>
             Laporan
         </a>
+
+        @if(Auth::user()->role === 'admin')
+        <div class="sidebar-section-label" style="padding-top: 14px;">Akses Cepat Cabang</div>
+        <form method="POST" action="{{ route('auth.switch.suci') }}" style="margin: 0; padding: 0 4px;">
+            @csrf
+            <button type="submit" class="nav-item" style="width: 100%; border: 1px solid rgba(59,130,246,0.3); background: rgba(37,99,235,0.12); color: #93c5fd; cursor: pointer; text-align: left;">
+                <i class="fas fa-map-marker-alt" style="color: #60a5fa;"></i>
+                <span>Masuk ke Cabang Suci</span>
+            </button>
+        </form>
+        @endif
+
+        @if(session('impersonator_admin_id') || (!empty(Auth::user()->impersonated_by_admin_id)))
+        <div class="sidebar-section-label" style="padding-top: 14px; color: #facc15;">Mode Penyamaran</div>
+        <form method="POST" action="{{ route('auth.switch.back') }}" style="margin: 0; padding: 0 4px;">
+            @csrf
+            <button type="submit" class="nav-item" style="width: 100%; border: 1px solid rgba(234,179,8,0.4); background: rgba(234,179,8,0.15); color: #fde047; cursor: pointer; text-align: left; font-weight: 800;">
+                <i class="fas fa-arrow-left" style="color: #facc15;"></i>
+                <span>Kembali ke Admin</span>
+            </button>
+        </form>
+        @endif
     </nav>
 </aside>
 
@@ -748,7 +779,18 @@
                     <div class="user-name">{{ Auth::user()->name }}</div>
                     <div class="user-role">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'Kepala Cabang' }}</div>
                 </div>
-                <div class="avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                <div class="avatar">
+                    @if(Auth::user()->foto)
+                        <img 
+                            src="{{ asset(Auth::user()->foto) }}?v={{ Auth::user()->updated_at ? Auth::user()->updated_at->timestamp : time() }}" 
+                            alt="{{ Auth::user()->name }}"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <span style="display:none;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                    @else
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    @endif
+                </div>
                 <i class="fas fa-chevron-down" style="font-size: 11px; color: rgba(255,255,255,0.7); margin-left: 2px;"></i>
 
                 <!-- DROPDOWN CONTENT -->
@@ -763,7 +805,16 @@
                         <span>Detail Profil Saya</span>
                     </a>
 
+                    @if(session('impersonator_admin_id') || (!empty(Auth::user()->impersonated_by_admin_id)))
+                    <form method="POST" action="{{ route('auth.switch.back') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="user-dropdown-item" style="color: #b45309; background: #fef3c7; font-weight: 700;">
+                            <i class="fas fa-arrow-left" style="color: #d97706;"></i>
+                            <span>Kembali ke Admin</span>
+                        </button>
+                    </form>
                     <div class="user-dropdown-divider"></div>
+                    @endif
 
                     <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                         @csrf

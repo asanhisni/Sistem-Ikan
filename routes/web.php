@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     // Detail & Update Profil Pengguna
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
 
     Route::resource('transaksi', TransaksiController::class);
     Route::post('/transaksi/{transaksi}/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
@@ -46,4 +47,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('ikan', IkanController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::resource('users', UserController::class);
+    Route::post('/cabang', [\App\Http\Controllers\CabangController::class, 'store'])->name('cabang.store');
+    Route::delete('/cabang/{cabang}', [\App\Http\Controllers\CabangController::class, 'destroy'])->name('cabang.destroy');
+
+    // Beralih Cepat ke Kepala Cabang Suci & Kembali
+    Route::post('/switch-cabang-suci', [AuthController::class, 'switchCabangSuci'])->name('auth.switch.suci');
+    Route::post('/switch-back-admin', [AuthController::class, 'switchBackAdmin'])->name('auth.switch.back');
 });

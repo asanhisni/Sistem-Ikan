@@ -177,8 +177,51 @@
     }
 
     .ikan-info {
+        font-weight: 750;
+        color: #0f172a;
+        font-size: 13.5px;
+    }
+
+    .ikan-item-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 12.5px;
+    }
+
+    .ikan-name-txt {
         font-weight: 700;
-        color: #1F2937;
+        color: #1e293b;
+    }
+
+    .ikan-weight-txt {
+        font-weight: 700;
+        color: #2563eb;
+        background: #eff6ff;
+        padding: 1px 6px;
+        border-radius: 5px;
+        font-size: 11.5px;
+        white-space: nowrap;
+    }
+
+    .ikan-total-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        font-weight: 800;
+        color: #166534;
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        padding: 2px 8px;
+        border-radius: 6px;
+        margin-top: 3px;
+        width: fit-content;
     }
 
     .total-harga {
@@ -623,14 +666,30 @@
     @endif
 
     <div class="toolbar">
+        @if(Auth::user()->role !== 'admin')
         <a href="{{ route('transaksi.create') }}" class="btn-tambah">
             <i class="fas fa-plus-circle"></i>
             <span>Buat Transaksi Baru</span>
         </a>
+        @else
+        <div style="display:inline-flex;align-items:center;gap:8px;background:#f1f5f9;color:#64748b;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;">
+            <i class="fas fa-eye"></i>
+            <span>Mode Monitoring — Hanya Lihat Data</span>
+        </div>
+        @endif
 
         <form class="search-form" id="searchFilterForm" method="GET" action="{{ route('transaksi.index') }}">
             <input type="text" name="search" id="searchInput" placeholder="Cari nama atau no HP..." value="{{ $search ?? '' }}">
             
+            @if(Auth::user()->role === 'admin')
+            <select name="cabang" id="cabangSelect" onchange="this.form.requestSubmit()">
+                <option value="">Semua Cabang</option>
+                <option value="Suci" {{ ($cabang ?? '') == 'Suci' ? 'selected' : '' }}>Cabang Suci</option>
+                <option value="Cilawu" {{ ($cabang ?? '') == 'Cilawu' ? 'selected' : '' }}>Cabang Cilawu</option>
+                <option value="Samarang" {{ ($cabang ?? '') == 'Samarang' ? 'selected' : '' }}>Cabang Samarang</option>
+            </select>
+            @endif
+
             <select name="status" id="statusSelect" onchange="this.form.requestSubmit()">
                 <option value="">Semua Status</option>
                 <option value="lunas" {{ ($status ?? '') == 'lunas' ? 'selected' : '' }}>Lunas</option>
@@ -667,7 +726,7 @@
             </div>
 
             <button type="submit"><i class="fas fa-search"></i> CARI</button>
-            @if($search || $status || $tanggal || $bulan || $tahun)
+            @if($search || $status || $tanggal || $bulan || $tahun || ($cabang ?? ''))
                 <a href="{{ route('transaksi.index') }}" class="reset-link" id="resetFilterBtn">Reset</a>
             @endif
         </form>
@@ -710,20 +769,29 @@
                                 @if($t->details && $t->details->count() > 0)
                                     <div style="display: flex; flex-direction: column; gap: 4px;">
                                         @foreach($t->details as $d)
-                                            <div>
-                                                <span class="ikan-info">{{ $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?? '-') }}</span>
-                                                <span style="font-size: 13px; color: var(--text-muted);">({{ $d->jumlah_kg }} Kg)</span>
+                                            @php
+                                                $namaIkan = $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?: ($t->ikan ? $t->ikan->nama_ikan : 'Ikan'));
+                                            @endphp
+                                            <div class="ikan-item-pill">
+                                                <span class="ikan-name-txt">{{ $namaIkan }}</span>
+                                                <span class="ikan-weight-txt">{{ number_format($d->jumlah_kg, 2) }} Kg</span>
                                             </div>
                                         @endforeach
                                         @if($t->details->count() > 1)
-                                            <div style="font-size: 11px; font-weight: 700; color: #166534; margin-top: 2px;">
-                                                Total: {{ $t->jumlah_kg }} Kg
+                                            <div class="ikan-total-badge">
+                                                <i class="fas fa-calculator" style="font-size: 10px;"></i>
+                                                <span>Total: {{ number_format($t->jumlah_kg, 2) }} Kg</span>
                                             </div>
                                         @endif
                                     </div>
                                 @else
-                                    <div class="ikan-info">{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</div>
-                                    <div>{{ $t->jumlah_kg }} Kg</div>
+                                    @php
+                                        $namaIkan = $t->ikan ? $t->ikan->nama_ikan : 'Ikan';
+                                    @endphp
+                                    <div class="ikan-item-pill">
+                                        <span class="ikan-name-txt">{{ $namaIkan }}</span>
+                                        <span class="ikan-weight-txt">{{ number_format($t->jumlah_kg, 2) }} Kg</span>
+                                    </div>
                                 @endif
                             </td>
                             <td>
@@ -743,7 +811,7 @@
                             <td>
                                 <a href="{{ route('transaksi.show', $t->id) }}" class="btn-aksi" style="background: #e0f2fe; color: #0284c7;" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                                 <a href="{{ route('transaksi.edit', $t->id) }}" class="btn-aksi btn-edit" title="Edit"><i class="fas fa-pen"></i></a>
-                                @if(Auth::user()->role === 'admin')
+                                @if(Auth::user()->role !== 'kepala_cabang')
                                 <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" style="display:inline;" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Transaksi?', 'Apakah Anda yakin ingin menghapus transaksi ini? Stok ikan akan dikembalikan.');">
                                     @csrf
                                     @method('DELETE')
@@ -798,27 +866,31 @@
                     </div>
                 </div>
 
-                <!-- Bagian Tengah: Daftar Ikan (Nama di Kiri - Gelap, Berat di Kanan - Abu-abu sejajar) -->
+                <!-- Bagian Tengah: Daftar Ikan (Nama di Kiri - Gelap, Berat di Kanan - Biru/Rapi sejajar) -->
                 <div class="mobile-items">
                     @if($t->details && $t->details->count() > 0)
                         @foreach($t->details as $d)
+                            @php
+                                $mNamaIkan = $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?: ($t->ikan ? $t->ikan->nama_ikan : 'Ikan'));
+                            @endphp
                             <div class="mobile-item-row">
                                 <div class="mobile-item-name">
-                                    <span style="color: #94a3b8; font-size: 14px;">•</span>
-                                    <span>{{ $d->ikan ? $d->ikan->nama_ikan : ($d->nama_ikan ?? '-') }}</span>
+                                    <span>{{ $mNamaIkan }}</span>
                                 </div>
-                                <div class="mobile-item-weight">
+                                <div class="mobile-item-weight" style="background: #f1f5f9; padding: 2px 7px; border-radius: 6px; font-weight: 700; color: #1e293b;">
                                     {{ number_format($d->jumlah_kg, 2) }} Kg
                                 </div>
                             </div>
                         @endforeach
                     @else
+                        @php
+                            $mNamaIkan = $t->ikan ? $t->ikan->nama_ikan : 'Ikan';
+                        @endphp
                         <div class="mobile-item-row">
                             <div class="mobile-item-name">
-                                <span style="color: #94a3b8; font-size: 14px;">•</span>
-                                <span>{{ $t->ikan ? $t->ikan->nama_ikan : '-' }}</span>
+                                <span>{{ $mNamaIkan }}</span>
                             </div>
-                            <div class="mobile-item-weight">
+                            <div class="mobile-item-weight" style="background: #f1f5f9; padding: 2px 7px; border-radius: 6px; font-weight: 700; color: #1e293b;">
                                 {{ number_format($t->jumlah_kg, 2) }} Kg
                             </div>
                         </div>
@@ -839,7 +911,7 @@
                     <div class="mobile-actions">
                         <a href="{{ route('transaksi.show', $t->id) }}" class="mobile-btn receipt" title="Lihat Struk / WA"><i class="fas fa-receipt"></i></a>
                         <a href="{{ route('transaksi.edit', $t->id) }}" class="mobile-btn edit" title="Edit"><i class="fas fa-pen"></i></a>
-                        @if(Auth::user()->role === 'admin')
+                        @if(Auth::user()->role !== 'kepala_cabang')
                         <form action="{{ route('transaksi.destroy', $t->id) }}" method="POST" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Transaksi?', 'Apakah Anda yakin ingin menghapus transaksi ini? Stok ikan akan dikembalikan.');" style="margin: 0;">
                             @csrf
                             @method('DELETE')

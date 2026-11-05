@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'foto',
         'username',
         'email',
         'telepon',
@@ -26,7 +27,16 @@ class User extends Authenticatable
         'recovery_pin',
         'role',
         'cabang_id',
+        'impersonated_by_admin_id',
     ];
+
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto && file_exists(public_path($this->foto))) {
+            return asset($this->foto);
+        }
+        return null;
+    }
 
     public function cabang()
     {

@@ -606,17 +606,19 @@
     </div>
     @endif
 
-    {{-- Bagian Atas: Header & Tombol Tambah --}}
+    {{-- Bagian Atas: Tombol Tambah --}}
     <div class="kc-header">
-        <div class="kc-header-top">
-            <div class="kc-title-wrap">
-                <h2>Manajemen Kepala Cabang</h2>
-                <p>Kelola akun dan penempatan kepala cabang di setiap lokasi</p>
+        <div class="kc-header-top" style="justify-content:flex-end;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; width:100%; justify-content:flex-end;">
+                <button type="button" onclick="openModalCabang()" class="btn-tambah-kc" style="background:#ffffff; color:#2563eb; border:1.5px solid #bfdbfe; box-shadow:0 4px 14px rgba(37,99,235,0.08);">
+                    <i class="fas fa-store"></i>
+                    <span>Tambah Cabang Baru</span>
+                </button>
+                <a href="{{ route('users.create') }}" class="btn-tambah-kc" id="btn-tambah-kepala">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Tambah Kepala Cabang</span>
+                </a>
             </div>
-            <a href="{{ route('users.create') }}" class="btn-tambah-kc" id="btn-tambah-kepala">
-                <i class="fas fa-plus"></i>
-                <span>Tambah Kepala Cabang</span>
-            </a>
         </div>
     </div>
 
@@ -775,6 +777,58 @@
             </div>
         </div>
     </div>
+
+    {{-- Section: Daftar Semua Cabang & Aksi Hapus Cabang --}}
+    <div class="kc-list-section" style="margin-top: 20px;">
+        <div class="kc-section-header" style="margin-bottom: 6px;">
+            <div class="kc-section-title" style="margin: 0;">
+                <i class="fas fa-store"></i>
+                <span>Daftar Cabang Aktif ({{ $cabang->count() }})</span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 14px;">
+            @foreach($cabang as $cb)
+            @php
+                $assignedUser = $users->firstWhere('cabang_id', $cb->id);
+            @endphp
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                <div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                        <span style="font-weight:800; color:#0f172a; font-size:15px;">{{ $cb->nama_cabang }}</span>
+                        <span style="font-size:11px; font-weight:700; color:#64748b; background:#e2e8f0; padding:2px 6px; border-radius:5px;">
+                            {{ $cb->kode_cabang ?: 'CBG' }}
+                        </span>
+                    </div>
+                    <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                        <i class="fas fa-map-marker-alt" style="color:#94a3b8; font-size:11px;"></i>
+                        <span>{{ $cb->lokasi ?: 'Lokasi belum diatur' }}</span>
+                    </div>
+                    <div style="margin-top:8px;">
+                        @if($assignedUser)
+                            <span style="font-size:11.5px; font-weight:700; color:#0369a1; background:#e0f2fe; padding:2px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                                <i class="fas fa-user-check"></i> {{ $assignedUser->name }}
+                            </span>
+                        @else
+                            <span style="font-size:11.5px; font-weight:600; color:#b45309; background:#fef3c7; padding:2px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                                <i class="fas fa-clock"></i> Belum Ada Kepala
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:flex-end; border-top:1px solid #e2e8f0; padding-top:8px;">
+                    <form action="{{ route('cabang.destroy', $cb->id) }}" method="POST" onsubmit="event.preventDefault(); confirmSwalDelete(this, 'Hapus Cabang {{ addslashes($cb->nama_cabang) }}?', 'Apakah Anda yakin ingin menghapus cabang ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;">
+                            <i class="fas fa-trash-alt"></i> Hapus Cabang
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
 </div>
 
 <!-- Modal Konfirmasi Hapus -->
@@ -797,10 +851,46 @@
         </div>
     </div>
 </div>
+<!-- ════ MODAL TAMBAH CABANG BARU ════ -->
+<div id="modalTambahCabang" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+    <div style="background:#fff; border-radius:20px; width:90%; max-width:440px; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25); animation:modalSlideUp 0.2s ease;">
+        <div style="padding:18px 24px; background:linear-gradient(135deg, #1e40af, #2563eb); color:#fff; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-weight:800; font-size:16px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-store"></i> Tambah Cabang Baru
+            </div>
+            <button type="button" onclick="closeModalCabang()" style="background:none; border:none; color:rgba(255,255,255,0.8); font-size:18px; cursor:pointer;">&times;</button>
+        </div>
+        <form action="{{ route('cabang.store') }}" method="POST" style="padding:22px;">
+            @csrf
+            <div class="form-group" style="margin-bottom:14px; text-align:left;">
+                <label for="nama_cabang_modal" style="display:block; font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;">Nama Cabang <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="nama_cabang" id="nama_cabang_modal" class="kc-search-input" placeholder="Contoh: Tarogong, Garut Kota, dll." required>
+            </div>
+            <div class="form-group" style="margin-bottom:14px; text-align:left;">
+                <label for="lokasi_modal" style="display:block; font-size:13px; font-weight:700; color:#1e293b; margin-bottom:6px;">Lokasi / Alamat Cabang</label>
+                <input type="text" name="lokasi" id="lokasi_modal" class="kc-search-input" placeholder="Contoh: Jl. Raya Tarogong No. 12">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button type="button" onclick="closeModalCabang()" style="background:#f1f5f9; color:#475569; border:none; padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer;">Batal</button>
+                <button type="submit" style="background:#2563eb; color:#fff; border:none; padding:10px 20px; border-radius:10px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,0.25);">Simpan Cabang</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
+function openModalCabang() {
+    const modal = document.getElementById('modalTambahCabang');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalCabang() {
+    const modal = document.getElementById('modalTambahCabang');
+    if (modal) modal.style.display = 'none';
+}
+
 function filterUsers() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     const items = document.querySelectorAll('.user-item-row');
@@ -833,8 +923,19 @@ function closeModal() {
     document.getElementById('deleteModal').classList.remove('show');
 }
 
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    }
+    const modalTambahCabang = document.getElementById('modalTambahCabang');
+    if (modalTambahCabang) {
+        modalTambahCabang.addEventListener('click', function(e) {
+            if (e.target === this) closeModalCabang();
+        });
+    }
 });
 </script>
 @endpush
