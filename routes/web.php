@@ -32,7 +32,10 @@ Route::post('/forgot-password/verify', [AuthController::class, 'verifyIdentity']
 Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
 
 // ─── Protected Routes (perlu login) ──────────────────────────────────────────
-Route::middleware(['auth'])->group(function () {
+// restore.impersonation dipasang SETELAH auth agar Auth::user() sudah pasti terisi
+// (baik via session maupun via remember token auto-login) sebelum middleware
+// membaca impersonated_by_admin_id dari database untuk merestore session flag.
+Route::middleware(['auth', 'restore.impersonation'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Detail & Update Profil Pengguna
